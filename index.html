@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>.KODE — Kernel-Oriented Development Environment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap');
+
+/* ═══════════════════════ TOKENS ═══════════════════════ */
+:root {
+  --void:      #05060a;
+  --bg:        #080b12;
+  --panel:     #0b0f18;
+  --panel2:    #0e1420;
+  --glass:     rgba(8,11,18,0.94);
+  --hover:     rgba(255,255,255,0.042);
+  --border:    rgba(255,255,255,0.07);
+  --border-hi: rgba(255,255,255,0.13);
+
+  /* KOFFEE palette — cyan/purple/pink (VAD lineage) */
+  --kf-a:   #00d4ff;
+  --kf-b:   #b06ee6;
+  --kf-c:   #ff3cac;
+  --kf-glow:rgba(0,212,255,0.22);
+
+  /* G-KODE palette — amber/green/red (KAM lineage) */
+  --gk-a:   #ffaa00;
+  --gk-b:   #00ff9d;
+  --gk-c:   #ff4455;
+  --gk-glow:rgba(255,170,0,0.22);
+
+  /* neutral */
+  --green:  #00ff9d;
+  --amber:  #ffaa00;
+  --red:    #ff4455;
+  --t1:     #dde8f5;
+  --t2:     #7080a0;
+  --t3:     #384860;
+  --t4:     #1a2535;
+
+  --fm: 'Fira Code', monospace;
+  --fd: 'Syne', sans-serif;
+
+  /* dynamic — swapped by mode */
+  --acc:    var(--kf-a);
+  --acc-b:  var(--kf-b);
+  --acc-c:  var(--kf-c);
+  --acc-glow: var(--kf-glow);
+}
+
+/* ── MODE THEMES ── */
+body.mode-gkode {
+  --acc:    var(--gk-a);
+  --acc-b:  var(--gk-b);
+  --acc-c:  var(--gk-c);
+  --acc-glow: var(--gk-glow);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--void);
+  color:var(--t1);font-family:var(--fd);font-size:13px;
+  -webkit-font-smoothing:antialiased;}
+
+/* ═══════════════════════ LAYOUT ═══════════════════════ */
+#app{display:flex;flex-direction:column;width:100vw;height:100vh;overflow:hidden;}
+
+/* ═══════════════════════ TOPBAR ═══════════════════════ */
+#topbar{
+  height:44px;flex-shrink:0;
+  display:flex;align-items:center;gap:0;
+  background:var(--glass);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border-bottom:1px solid var(--border);
+  padding:0 12px;z-index:60;
+}
+
+/* Brand */
+.brand{display:flex;align-items:center;gap:9px;margin-right:16px;flex-shrink:0;cursor:default;user-select:none;}
+.brand-mark{
+  width:30px;height:30px;flex-shrink:0;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-weight:600;font-size:9px;color:#000;
+  letter-spacing:0.04em;transition:all 0.4s;
+}
+.mode-koffee .brand-mark{
+  background:linear-gradient(135deg,var(--kf-a) 0%,var(--kf-c) 100%);
+  box-shadow:0 0 18px rgba(0,212,255,0.35),0 0 36px rgba(255,60,172,0.15);
+}
+.mode-gkode .brand-mark{
+  background:linear-gradient(135deg,var(--gk-a) 0%,var(--gk-b) 100%);
+  box-shadow:0 0 18px rgba(255,170,0,0.35),0 0 36px rgba(0,255,157,0.15);
+}
+.brand-col{line-height:1.1;}
+.brand-name{
+  font-family:var(--fd);font-weight:800;font-size:14px;letter-spacing:-0.02em;
+  transition:all 0.4s;
+}
+.mode-koffee .brand-name{
+  background:linear-gradient(90deg,var(--kf-a) 0%,var(--kf-b) 50%,var(--kf-c) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.mode-gkode .brand-name{
+  background:linear-gradient(90deg,var(--gk-a) 0%,var(--gk-b) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.brand-sub{font-family:var(--fm);font-size:7px;color:var(--t3);letter-spacing:0.18em;text-transform:uppercase;margin-top:2px;transition:all 0.3s;}
+
+.tb-div{width:1px;height:18px;background:var(--border);margin:0 6px;flex-shrink:0;}
+
+/* ── MODE TOGGLE ── */
+.mode-toggle{
+  display:flex;align-items:center;gap:0;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:8px;padding:3px;
+  flex-shrink:0;
+}
+.mode-btn{
+  padding:4px 11px;
+  font-family:var(--fm);font-size:9px;font-weight:500;
+  letter-spacing:0.08em;text-transform:uppercase;
+  border-radius:5px;cursor:pointer;border:none;
+  background:transparent;color:var(--t3);
+  transition:all 0.2s;white-space:nowrap;
+}
+.mode-btn.active.koffee{
+  background:linear-gradient(90deg,rgba(0,212,255,0.18),rgba(255,60,172,0.18));
+  color:var(--kf-a);
+  box-shadow:0 0 12px rgba(0,212,255,0.15);
+}
+.mode-btn.active.gkode{
+  background:linear-gradient(90deg,rgba(255,170,0,0.18),rgba(0,255,157,0.18));
+  color:var(--gk-a);
+  box-shadow:0 0 12px rgba(255,170,0,0.15);
+}
+
+/* Topbar utility buttons */
+.tbb{
+  height:28px;padding:0 9px;
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--fm);font-size:10px;font-weight:500;
+  color:var(--t2);background:none;border:none;
+  border-radius:5px;cursor:pointer;transition:all 0.12s;
+  letter-spacing:0.03em;white-space:nowrap;
+}
+.tbb:hover{color:var(--t1);background:var(--hover);}
+.tbb svg{width:12px;height:12px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.6;}
+
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+
+.btn-run{
+  height:28px;padding:0 14px;
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:0.06em;
+  border:none;border-radius:5px;cursor:pointer;transition:all 0.2s;
+}
+.mode-koffee .btn-run{
+  background:linear-gradient(90deg,var(--kf-a),#2b86c5);color:#000;
+  box-shadow:0 0 14px rgba(0,212,255,0.3);
+}
+.mode-gkode .btn-run{
+  background:linear-gradient(90deg,var(--gk-a),var(--gk-b));color:#000;
+  box-shadow:0 0 14px rgba(255,170,0,0.3);
+}
+.btn-run:hover{filter:brightness(1.15);}
+.btn-run svg{width:10px;height:10px;fill:#000;stroke:none;}
+
+.btn-clear{
+  height:28px;padding:0 10px;
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--fm);font-size:10px;font-weight:500;
+  color:var(--red);background:none;
+  border:1px solid rgba(255,68,102,0.28);border-radius:5px;cursor:pointer;
+  transition:all 0.12s;letter-spacing:0.04em;
+}
+.btn-clear:hover{background:rgba(255,68,102,0.1);border-color:var(--red);}
+
+/* ═══════════════════════ TABS ═══════════════════════ */
+#tabs-row{
+  height:32px;flex-shrink:0;
+  display:flex;align-items:flex-end;
+  background:var(--panel);border-bottom:1px solid var(--border);
+  padding:0 0 0 8px;gap:2px;overflow-x:auto;overflow-y:hidden;
+}
+#tabs-row::-webkit-scrollbar{height:0;}
+.tab{
+  display:flex;align-items:center;gap:6px;
+  height:26px;padding:0 12px;
+  font-family:var(--fm);font-size:11px;color:var(--t3);
+  background:transparent;border:1px solid transparent;
+  border-bottom:none;border-radius:4px 4px 0 0;
+  cursor:default;white-space:nowrap;flex-shrink:0;
+}
+.tab.active{background:var(--bg);color:var(--t1);border-color:var(--border);border-bottom-color:var(--bg);}
+.tab-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+  transition:all 0.3s;
+}
+.mode-koffee .tab-dot{background:linear-gradient(135deg,var(--kf-a),var(--kf-c));box-shadow:0 0 5px var(--kf-a);}
+.mode-gkode  .tab-dot{background:linear-gradient(135deg,var(--gk-a),var(--gk-b));box-shadow:0 0 5px var(--gk-a);}
+
+/* ═══════════════════════ BODY ═══════════════════════ */
+#body{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+
+/* ═══════════════════════ EDITOR AREA ═══════════════════════ */
+#editor-area{flex:1;display:flex;min-height:0;overflow:hidden;position:relative;}
+
+/* Gutter */
+#gutter{
+  width:48px;padding:14px 10px 14px 0;
+  font-family:var(--fm);font-size:12px;line-height:1.72;
+  color:var(--t3);text-align:right;
+  background:var(--bg);border-right:1px solid var(--border);
+  overflow:hidden;flex-shrink:0;user-select:none;
+}
+.gl{padding-right:10px;}
+.gl.aln{color:var(--acc);}
+
+/* Editor */
+#editor{
+  flex:1;padding:14px 16px;
+  font-family:var(--fm);font-size:12.5px;line-height:1.72;
+  background:var(--bg);color:var(--t1);
+  border:none;outline:none;resize:none;
+  tab-size:2;white-space:pre;
+  overflow-y:auto;overflow-x:auto;
+  caret-color:var(--acc);letter-spacing:0.01em;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+  transition:caret-color 0.3s;
+}
+#editor::selection{background:rgba(0,212,255,0.16);}
+.mode-gkode #editor::selection{background:rgba(255,170,0,0.14);}
+
+/* Minimap */
+#minimap{width:60px;background:var(--bg);border-left:1px solid var(--border);overflow:hidden;flex-shrink:0;}
+#mm-canvas{display:block;}
+
+/* ── G-KODE PREVIEW PANE ── */
+#gkode-preview{
+  display:none;width:200px;
+  background:var(--panel);border-left:1px solid var(--border);
+  flex-direction:column;flex-shrink:0;overflow:hidden;
+}
+.mode-gkode #gkode-preview{display:flex;}
+.mode-gkode #minimap{display:none;}
+.preview-head{
+  padding:6px 10px;
+  font-family:var(--fm);font-size:8px;color:var(--t3);
+  letter-spacing:0.14em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.preview-head span{color:var(--gk-b);}
+#toolpath-canvas{display:block;flex:1;width:100%;cursor:crosshair;}
+
+/* ── FIND BAR ── */
+#find-bar{
+  position:absolute;top:8px;right:68px;z-index:50;
+  background:var(--panel2);border:1px solid var(--border-hi);
+  border-radius:7px;padding:7px 10px;
+  display:none;gap:7px;align-items:center;
+  box-shadow:0 8px 32px rgba(0,0,0,0.6);
+  backdrop-filter:blur(12px);
+}
+#find-bar.open{display:flex;}
+#find-input{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:4px;padding:4px 9px;
+  color:var(--t1);font-family:var(--fm);font-size:11px;
+  outline:none;width:150px;
+}
+#find-input:focus{border-color:var(--acc);}
+#find-count{font-family:var(--fm);font-size:10px;color:var(--t3);min-width:46px;}
+.find-nav{background:transparent;border:1px solid var(--border);border-radius:4px;
+  padding:3px 7px;color:var(--t2);cursor:pointer;font-size:11px;transition:all 0.1s;}
+.find-nav:hover{color:var(--acc);border-color:var(--acc);}
+.find-close{background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:0 2px;transition:color 0.1s;}
+.find-close:hover{color:var(--red);}
+
+/* ── AUTOCOMPLETE ── */
+#autocomplete{
+  position:absolute;z-index:100;
+  background:var(--panel2);border:1px solid var(--border-hi);
+  border-radius:7px;min-width:220px;max-height:185px;
+  overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,0.7);
+  display:none;font-family:var(--fm);font-size:11px;
+  backdrop-filter:blur(16px);
+}
+.ac-item{padding:5px 12px;cursor:pointer;display:flex;gap:9px;align-items:center;transition:background 0.08s;}
+.ac-item:hover,.ac-item.sel{background:var(--hover);}
+.ac-item.sel .ac-label{color:var(--acc);}
+.ac-kind{font-size:9px;color:var(--t3);min-width:24px;letter-spacing:0.06em;}
+.ac-label{color:var(--t1);}
+.ac-detail{color:var(--t3);font-size:9px;margin-left:auto;}
+
+/* ═══════════════════════ RESIZER ═══════════════════════ */
+#resizer{
+  height:5px;background:var(--border);
+  cursor:ns-resize;flex-shrink:0;position:relative;transition:background 0.15s;
+}
+#resizer:hover,#resizer.drag{background:var(--acc);}
+#resizer::after{
+  content:'';position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:28px;height:3px;background:var(--t3);border-radius:2px;
+}
+
+/* ═══════════════════════ OUTPUT PANEL ═══════════════════════ */
+#output-panel{height:210px;display:flex;flex-direction:column;border-top:1px solid var(--border);flex-shrink:0;min-height:54px;}
+
+#out-tabs{
+  height:30px;display:flex;align-items:center;
+  background:var(--panel);border-bottom:1px solid var(--border);
+  padding:0 8px;gap:2px;flex-shrink:0;
+}
+.out-tab{
+  padding:4px 11px;font-family:var(--fm);font-size:9px;font-weight:500;
+  letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;border-radius:4px 4px 0 0;
+  color:var(--t3);transition:all 0.12s;
+  border:1px solid transparent;border-bottom:none;
+}
+.out-tab:hover{color:var(--t2);}
+.out-tab.active{background:var(--bg);color:var(--t1);border-color:var(--border);}
+#exec-badge{margin-left:auto;font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.06em;padding-right:4px;}
+#exec-badge.ok{color:var(--green);}
+#exec-badge.err{color:var(--red);}
+
+/* Console */
+#console-pane{
+  flex:1;overflow-y:auto;padding:8px 14px;
+  font-family:var(--fm);font-size:11.5px;line-height:1.75;
+  background:var(--bg);
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+#console-pane::-webkit-scrollbar{width:4px;}
+#console-pane::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.log{display:flex;gap:10px;padding:1px 0;align-items:flex-start;}
+.log:hover{background:var(--hover);}
+.log-n{color:var(--t4);min-width:24px;text-align:right;font-size:10px;padding-top:2px;user-select:none;flex-shrink:0;}
+.log-ic{min-width:16px;flex-shrink:0;padding-top:1px;font-size:11px;}
+.log-msg{flex:1;white-space:pre-wrap;word-break:break-all;color:var(--t1);}
+.log-ts{color:var(--t4);font-size:9px;align-self:center;flex-shrink:0;}
+.log-warn .log-ic::before{content:'▲';color:var(--amber);}
+.log-warn .log-msg{color:var(--amber);}
+.log-error .log-ic::before{content:'✕';color:var(--red);}
+.log-error .log-msg{color:var(--red);}
+.log-result .log-ic::before{content:'←';color:var(--kf-b);}
+.log-result .log-msg{color:var(--kf-b);}
+.log-group .log-msg{color:var(--acc);font-weight:500;}
+.log-gcode .log-ic::before{content:'⊳';color:var(--gk-b);}
+.log-gcode .log-msg{color:var(--gk-b);}
+.log-info .log-msg{color:var(--t1);}
+.val-num{color:var(--kf-a);}
+.val-str{color:var(--green);}
+.val-bool{color:var(--amber);}
+.val-null{color:var(--t3);font-style:italic;}
+.val-obj{color:var(--kf-b);}
+
+/* G-KODE: machine params pane */
+#gkode-params{display:none;flex:1;overflow-y:auto;padding:10px 14px;background:var(--bg);}
+#gkode-params.active{display:block;}
+#console-pane.hidden{display:none;}
+.param-section{margin-bottom:14px;}
+.param-sec-head{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.param-row{display:flex;flex-direction:column;gap:3px;}
+.param-label{font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.08em;}
+.param-input{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:4px;padding:4px 8px;
+  color:var(--gk-a);font-family:var(--fm);font-size:11px;
+  outline:none;width:100%;transition:border-color 0.15s;
+}
+.param-input:focus{border-color:var(--gk-a);}
+.param-select{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:4px;padding:4px 8px;
+  color:var(--t1);font-family:var(--fm);font-size:11px;
+  outline:none;width:100%;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  transition:border-color 0.15s;
+}
+.param-select:focus{border-color:var(--gk-b);}
+
+.console-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:6px;color:var(--t3);font-size:11px;letter-spacing:0.08em;
+  text-align:center;padding:20px;
+}
+.console-empty .kode-glyph{
+  font-family:var(--fd);font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px;
+  transition:all 0.3s;
+}
+.mode-koffee .kode-glyph{
+  background:linear-gradient(90deg,var(--kf-a),var(--kf-c));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.mode-gkode .kode-glyph{
+  background:linear-gradient(90deg,var(--gk-a),var(--gk-b));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.empty-hint{color:var(--t4);font-size:10px;}
+
+/* ═══════════════════════ STATUS BAR ═══════════════════════ */
+#statusbar{
+  height:24px;flex-shrink:0;
+  display:flex;align-items:center;padding:0 12px;gap:14px;
+  font-family:var(--fm);font-size:10px;font-weight:500;
+  color:rgba(0,0,0,0.75);letter-spacing:0.04em;
+  transition:background 0.4s;
+}
+.mode-koffee #statusbar{background:linear-gradient(90deg,rgba(0,212,255,0.88),rgba(176,110,230,0.88),rgba(255,60,172,0.88));}
+.mode-gkode  #statusbar{background:linear-gradient(90deg,rgba(255,170,0,0.88),rgba(0,255,157,0.88));}
+#statusbar .sb-r{margin-left:auto;display:flex;gap:14px;}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── RUN FLASH ── */
+@keyframes rflash{0%{box-shadow:inset 0 0 0 1px var(--acc);}100%{box-shadow:none;}}
+.run-flash{animation:rflash 0.4s ease-out;}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--panel2);border:1px solid var(--border-hi);
+  border-radius:6px;padding:6px 14px;
+  font-family:var(--fm);font-size:11px;color:var(--t1);
+  letter-spacing:0.04em;white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.2s,transform 0.2s;
+  backdrop-filter:blur(12px);z-index:200;
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── MODE TRANSITION ── */
+#editor-area,#topbar,#statusbar,#output-panel{transition:all 0.0s;}
+</style>
+</head>
+<body class="mode-koffee">
+<div id="app">
+
+<!-- ── TOPBAR ── -->
+<div id="topbar">
+  <div class="brand">
+    <div class="brand-mark" id="brand-mark">KD</div>
+    <div class="brand-col">
+      <div class="brand-name" id="brand-name">.KODE</div>
+      <div class="brand-sub" id="brand-sub">kernel-oriented dev env</div>
+    </div>
+  </div>
+
+  <div class="tb-div"></div>
+
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle">
+    <button class="mode-btn koffee active" id="btn-koffee">☕ KOFFEE</button>
+    <button class="mode-btn gkode"         id="btn-gkode">⚙ G-KODE</button>
+  </div>
+
+  <div class="tb-div"></div>
+
+  <button class="tbb" id="btn-find" title="Ctrl+F">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Find
+  </button>
+  <button class="tbb" id="btn-format" title="Format">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+    Format
+  </button>
+
+  <div class="tb-right">
+    <button class="btn-clear" id="btn-clear">⊘ Clear</button>
+    <button class="btn-run" id="btn-run">
+      <svg viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9"/></svg>
+      <span id="run-label">Run</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── TABS ── -->
+<div id="tabs-row">
+  <div class="tab active"><div class="tab-dot"></div><span id="tab-name">main.js</span></div>
+</div>
+
+<!-- ── BODY ── -->
+<div id="body">
+  <div id="editor-area">
+    <div id="gutter"></div>
+    <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+
+    <!-- KOFFEE: minimap -->
+    <div id="minimap"><canvas id="mm-canvas"></canvas></div>
+
+    <!-- G-KODE: toolpath preview -->
+    <div id="gkode-preview">
+      <div class="preview-head">Toolpath Preview <span id="tp-stat">—</span></div>
+      <canvas id="toolpath-canvas"></canvas>
+    </div>
+
+    <!-- autocomplete -->
+    <div id="autocomplete"></div>
+    <!-- find bar -->
+    <div id="find-bar">
+      <input id="find-input" placeholder="Search…"/>
+      <span id="find-count"></span>
+      <button class="find-nav" id="find-prev">↑</button>
+      <button class="find-nav" id="find-next">↓</button>
+      <button class="find-close" id="find-close">✕</button>
+    </div>
+  </div>
+
+  <div id="resizer"></div>
+
+  <!-- ── OUTPUT ── -->
+  <div id="output-panel">
+    <div id="out-tabs">
+      <div class="out-tab active" id="ot-console">Console</div>
+      <div class="out-tab" id="ot-problems">Problems</div>
+      <div class="out-tab" id="ot-params" style="display:none">Machine</div>
+      <span id="exec-badge"></span>
+    </div>
+    <div id="console-pane">
+      <div class="console-empty">
+        <div class="kode-glyph">.KODE</div>
+        Ready — executing…
+        <div class="empty-hint">Ctrl+Enter to run</div>
+      </div>
+    </div>
+    <div id="gkode-params">
+      <div class="param-section">
+        <div class="param-sec-head">Machine</div>
+        <div class="param-grid">
+          <div class="param-row"><span class="param-label">Feed Rate (mm/min)</span><input class="param-input" id="p-feed" value="1200"/></div>
+          <div class="param-row"><span class="param-label">Spindle (RPM)</span><input class="param-input" id="p-rpm" value="18000"/></div>
+          <div class="param-row"><span class="param-label">Plunge Rate</span><input class="param-input" id="p-plunge" value="300"/></div>
+          <div class="param-row"><span class="param-label">Safe Z (mm)</span><input class="param-input" id="p-safez" value="5.0"/></div>
+        </div>
+      </div>
+      <div class="param-section">
+        <div class="param-sec-head">Material</div>
+        <div class="param-grid">
+          <div class="param-row"><span class="param-label">Depth per Pass</span><input class="param-input" id="p-depth" value="0.5"/></div>
+          <div class="param-row"><span class="param-label">Total Depth</span><input class="param-input" id="p-total" value="3.0"/></div>
+          <div class="param-row"><span class="param-label">Units</span>
+            <select class="param-select" id="p-units"><option>mm</option><option>inch</option></select>
+          </div>
+          <div class="param-row"><span class="param-label">Tool Dia (mm)</span><input class="param-input" id="p-dia" value="3.175"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /body -->
+</div><!-- /app -->
+
+<!-- ── STATUS BAR ── -->
+<div id="statusbar">
+  <span id="sb-mode">● JS</span>
+  <span id="sb-cursor">Ln 1, Col 1</span>
+  <span id="sb-sel"></span>
+  <div class="sb-r">
+    <span id="sb-errors">✕ 0 &nbsp;▲ 0</span>
+    <span>UTF-8</span>
+    <span id="sb-unit">2 spaces</span>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   .KODE  — dual-mode IDE
+   KOFFEE : JavaScript REPL
+   G-KODE : G-code editor + toolpath visualiser
+══════════════════════════════════════════════════════════ */
+
+/* ── DOM REFS ── */
+const $body     = document.body;
+const editor    = document.getElementById('editor');
+const gutter    = document.getElementById('gutter');
+const conPane   = document.getElementById('console-pane');
+const execBadge = document.getElementById('exec-badge');
+const sbCursor  = document.getElementById('sb-cursor');
+const sbSel     = document.getElementById('sb-sel');
+const sbErrors  = document.getElementById('sb-errors');
+const sbMode    = document.getElementById('sb-mode');
+const acMenu    = document.getElementById('autocomplete');
+const findBar   = document.getElementById('find-bar');
+const findInput = document.getElementById('find-input');
+const findCount = document.getElementById('find-count');
+const mmCanvas  = document.getElementById('mm-canvas');
+const mmCtx     = mmCanvas.getContext('2d');
+const tpCanvas  = document.getElementById('toolpath-canvas');
+const tpCtx     = tpCanvas.getContext('2d');
+const tpStat    = document.getElementById('tp-stat');
+const resizer   = document.getElementById('resizer');
+const outPanel  = document.getElementById('output-panel');
+const gkParams  = document.getElementById('gkode-params');
+const otConsole = document.getElementById('ot-console');
+const otParams  = document.getElementById('ot-params');
+
+/* ── MODE STATE ── */
+let mode = 'koffee'; // 'koffee' | 'gkode'
+
+const KOFFEE_CODE = `// .KODE · KOFFEE mode — JavaScript REPL
+// ▶ Run  or  Ctrl+Enter
+
+// ── Output ────────────────────────────────────
+console.log("☕ KOFFEE initialised");
+console.warn("warm path detected");
+console.error("sample error — non-fatal");
+
+// ── Data pipeline ─────────────────────────────
+const nums   = Array.from({length:10}, (_,i) => i+1);
+const result = nums
+  .filter(n => n % 2 === 0)
+  .map(n => n ** 2)
+  .reduce((a, b) => a + b, 0);
+console.log("even² sum:", result);
+
+// ── Fibonacci ─────────────────────────────────
+const fib = n => n <= 1 ? n : fib(n-1) + fib(n-2);
+console.log("fib(0‥8):", Array.from({length:9},(_,i)=>fib(i)));
+
+// ── Async ─────────────────────────────────────
+async function ping() {
+  const r = await new Promise(res =>
+    setTimeout(() => res({status:"ok",ms:12}), 40));
+  console.log("ping →", r);
+}
+ping();
+
+// ── Class ─────────────────────────────────────
+class Vec2 {
+  constructor(x,y){this.x=x;this.y=y;}
+  add(v){return new Vec2(this.x+v.x,this.y+v.y);}
+  mag(){return Math.hypot(this.x,this.y);}
+  toString(){return \`Vec2(\${this.x},\${this.y})\`;}
+}
+const a = new Vec2(3,4), b = new Vec2(1,2);
+console.log(a.add(b).toString(), "| mag:", a.mag());
+`;
+
+const GKODE_CODE = `; .KODE · G-KODE mode — CNC G-code editor
+; Machine: 3-axis router · Units: mm
+
+; ── Program Header ───────────────────────────
+G21          ; metric
+G90          ; absolute positioning
+G17          ; XY plane
+G94          ; feed per minute
+
+; ── Tool Setup ───────────────────────────────
+M6 T1        ; load tool 1 (3.175mm end mill)
+M3 S18000    ; spindle CW at 18000 RPM
+G4 P2        ; dwell 2 seconds
+
+; ── Safe Height ──────────────────────────────
+G0 Z5.0      ; rapid to safe Z
+
+; ── Contour 1 — 40×30mm rect ─────────────────
+G0 X0 Y0
+G1 Z-0.5 F300   ; plunge
+G1 X40   F1200
+G1 Y30
+G1 X0
+G1 Y0
+G0 Z5.0
+
+; ── Contour 2 — circle Ø20, centre 20,15 ─────
+G0 X30 Y15
+G1 Z-0.5 F300
+G2 X30 Y15 I-10 J0 F1200   ; full circle CW
+G0 Z5.0
+
+; ── Drill cycle — 4 holes ────────────────────
+G81 Z-3.0 R2.0 F300
+G0 X5  Y5
+G0 X35 Y5
+G0 X5  Y25
+G0 X35 Y25
+G80              ; cancel canned cycle
+
+; ── Program End ──────────────────────────────
+G0 Z10.0
+G0 X0 Y0
+M5           ; spindle off
+M30          ; program end
+`;
+
+editor.value = KOFFEE_CODE;
+
+/* ══════════════════════════════════════════
+   MODE SWITCHING
+══════════════════════════════════════════ */
+function setMode(m) {
+  mode = m;
+  $body.className = `mode-${m}`;
+
+  const isGK = m === 'gkode';
+
+  // Toggle button states
+  document.getElementById('btn-koffee').classList.toggle('active', !isGK);
+  document.getElementById('btn-gkode').classList.toggle('active', isGK);
+
+  // Tab / brand updates
+  document.getElementById('tab-name').textContent   = isGK ? 'program.nc' : 'main.js';
+  document.getElementById('run-label').textContent  = isGK ? 'Preview' : 'Run';
+  document.getElementById('brand-sub').textContent  = isGK ? 'g-code editor + preview' : 'kernel-oriented dev env';
+  document.getElementById('brand-mark').textContent = isGK ? 'GK' : 'KD';
+  sbMode.textContent = isGK ? '● G-code' : '● JS';
+  document.getElementById('sb-unit').textContent    = isGK ? 'G21 mm' : '2 spaces';
+
+  // Show/hide machine params tab
+  otParams.style.display = isGK ? '' : 'none';
+
+  // Switch editor content
+  editor.value = isGK ? GKODE_CODE : KOFFEE_CODE;
+
+  // Clear console
+  clearConsole();
+
+  closeAC();
+  syncGutter();
+  updateMinimap();
+  lint();
+
+  showToast(isGK ? '⚙ G-KODE mode — CNC G-code editor' : '☕ KOFFEE mode — JavaScript REPL');
+}
+
+document.getElementById('btn-koffee').addEventListener('click', () => setMode('koffee'));
+document.getElementById('btn-gkode').addEventListener('click',  () => setMode('gkode'));
+
+/* ══════════════════════════════════════════
+   OUTPUT TABS
+══════════════════════════════════════════ */
+function switchOutTab(tab) {
+  otConsole.classList.toggle('active', tab==='console');
+  otParams.classList.toggle('active',  tab==='params');
+  conPane.classList.toggle('hidden', tab==='params');
+  gkParams.classList.toggle('active',  tab==='params');
+}
+otConsole.addEventListener('click', () => switchOutTab('console'));
+otParams.addEventListener('click',  () => switchOutTab('params'));
+
+/* ══════════════════════════════════════════
+   GUTTER
+══════════════════════════════════════════ */
+function syncGutter() {
+  const lines = editor.value.split('\n');
+  const curLn = editor.value.substring(0, editor.selectionStart).split('\n').length - 1;
+  gutter.innerHTML = lines.map((_,i) =>
+    `<div class="gl${i===curLn?' aln':''}">${i+1}</div>`).join('');
+  gutter.scrollTop = editor.scrollTop;
+}
+editor.addEventListener('scroll', () => { gutter.scrollTop = editor.scrollTop; });
+
+/* ══════════════════════════════════════════
+   CURSOR / STATUS
+══════════════════════════════════════════ */
+function updateCursor() {
+  const before = editor.value.substring(0, editor.selectionStart).split('\n');
+  sbCursor.textContent = `Ln ${before.length}, Col ${before[before.length-1].length+1}`;
+  const sel = Math.abs(editor.selectionEnd - editor.selectionStart);
+  sbSel.textContent = sel ? `(${sel} sel)` : '';
+  syncGutter();
+}
+
+/* ══════════════════════════════════════════
+   KEYBOARD
+══════════════════════════════════════════ */
+editor.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); runCode(); return; }
+  if ((e.ctrlKey||e.metaKey) && e.key==='f')     { e.preventDefault(); openFind(); return; }
+  if (e.key==='Escape') { closeAC(); closeFind(); return; }
+  if (e.key==='Tab') {
+    e.preventDefault();
+    const s=editor.selectionStart, v=editor.value;
+    editor.value=v.substring(0,s)+'  '+v.substring(editor.selectionEnd);
+    editor.selectionStart=editor.selectionEnd=s+2;
+    syncGutter(); updateMinimap(); return;
+  }
+  if (mode==='koffee') {
+    const pairs={'(':')','{':'}','[':']','"':'"',"'":"'",'`':'`'};
+    if (pairs[e.key]&&!e.ctrlKey&&!e.metaKey) {
+      e.preventDefault();
+      const s=editor.selectionStart,sel=editor.value.substring(s,editor.selectionEnd);
+      const ins=e.key+sel+pairs[e.key];
+      editor.value=editor.value.substring(0,s)+ins+editor.value.substring(editor.selectionEnd);
+      editor.selectionStart=editor.selectionEnd=s+1;
+      syncGutter(); return;
+    }
+  }
+  if (acMenu.style.display==='block') {
+    if (e.key==='ArrowDown'){e.preventDefault();acMove(1);return;}
+    if (e.key==='ArrowUp')  {e.preventDefault();acMove(-1);return;}
+    if (e.key==='Enter'||e.key==='Tab'){e.preventDefault();acApply();return;}
+  }
+});
+editor.addEventListener('input',  () => { syncGutter(); updateCursor(); triggerAC(); updateMinimap(); lint(); });
+editor.addEventListener('click',  () => { updateCursor(); closeAC(); });
+editor.addEventListener('keyup',  updateCursor);
+editor.addEventListener('select', updateCursor);
+
+/* ══════════════════════════════════════════
+   AUTOCOMPLETE  — JS + G-code dual bank
+══════════════════════════════════════════ */
+const AC_JS = [
+  {l:'console.log',k:'fn',d:'(...args)→void'},
+  {l:'console.warn',k:'fn',d:'(...args)→void'},
+  {l:'console.error',k:'fn',d:'(...args)→void'},
+  {l:'console.table',k:'fn',d:'(data)→void'},
+  {l:'Array.from',k:'fn',d:'(iter)→Array'},
+  {l:'Object.keys',k:'fn',d:'(obj)→string[]'},
+  {l:'Object.values',k:'fn',d:'(obj)→any[]'},
+  {l:'Object.entries',k:'fn',d:'(obj)→[k,v][]'},
+  {l:'JSON.stringify',k:'fn',d:'(val)→string'},
+  {l:'JSON.parse',k:'fn',d:'(text)→any'},
+  {l:'Math.random',k:'fn',d:'()→number'},
+  {l:'Math.floor',k:'fn',d:'(n)→number'},
+  {l:'Math.hypot',k:'fn',d:'(...n)→number'},
+  {l:'setTimeout',k:'fn',d:'(fn,ms)→id'},
+  {l:'Promise.all',k:'fn',d:'(arr)→Promise'},
+  {l:'const',k:'kw',d:'block constant'},
+  {l:'let',k:'kw',d:'block variable'},
+  {l:'function',k:'kw',d:'declaration'},
+  {l:'async',k:'kw',d:'async fn'},
+  {l:'await',k:'kw',d:'await expr'},
+  {l:'return',k:'kw',d:'return'},
+  {l:'class',k:'kw',d:'class decl'},
+  {l:'for',k:'kw',d:'for loop'},
+  {l:'while',k:'kw',d:'while loop'},
+  {l:'if',k:'kw',d:'conditional'},
+  {l:'try',k:'kw',d:'error handling'},
+  {l:'throw',k:'kw',d:'throw'},
+  {l:'new',k:'kw',d:'constructor'},
+];
+
+const AC_GC = [
+  {l:'G0',k:'gc',d:'Rapid move'},
+  {l:'G1',k:'gc',d:'Linear feed'},
+  {l:'G2',k:'gc',d:'Arc CW'},
+  {l:'G3',k:'gc',d:'Arc CCW'},
+  {l:'G4',k:'gc',d:'Dwell'},
+  {l:'G17',k:'gc',d:'XY plane'},
+  {l:'G20',k:'gc',d:'Inch mode'},
+  {l:'G21',k:'gc',d:'Metric mode'},
+  {l:'G28',k:'gc',d:'Home position'},
+  {l:'G40',k:'gc',d:'Cancel comp'},
+  {l:'G41',k:'gc',d:'Tool comp left'},
+  {l:'G42',k:'gc',d:'Tool comp right'},
+  {l:'G43',k:'gc',d:'Tool length +'},
+  {l:'G80',k:'gc',d:'Cancel cycle'},
+  {l:'G81',k:'gc',d:'Drill cycle'},
+  {l:'G83',k:'gc',d:'Peck drill'},
+  {l:'G90',k:'gc',d:'Absolute'},
+  {l:'G91',k:'gc',d:'Incremental'},
+  {l:'G94',k:'gc',d:'Feed/min'},
+  {l:'M3',k:'mc',d:'Spindle CW'},
+  {l:'M4',k:'mc',d:'Spindle CCW'},
+  {l:'M5',k:'mc',d:'Spindle off'},
+  {l:'M6',k:'mc',d:'Tool change'},
+  {l:'M8',k:'mc',d:'Coolant on'},
+  {l:'M9',k:'mc',d:'Coolant off'},
+  {l:'M30',k:'mc',d:'Program end'},
+  {l:'F',k:'wd',d:'Feed rate'},
+  {l:'S',k:'wd',d:'Spindle speed'},
+  {l:'T',k:'wd',d:'Tool number'},
+  {l:'X',k:'wd',d:'X coordinate'},
+  {l:'Y',k:'wd',d:'Y coordinate'},
+  {l:'Z',k:'wd',d:'Z coordinate'},
+  {l:'I',k:'wd',d:'Arc X offset'},
+  {l:'J',k:'wd',d:'Arc Y offset'},
+  {l:'R',k:'wd',d:'Arc radius / retract'},
+];
+
+let acIdx=0, acMatches=[];
+
+function triggerAC() {
+  const pos=editor.selectionStart, text=editor.value.substring(0,pos);
+  const m = text.match(/[A-Za-z][A-Za-z0-9.]*$/);
+  if (!m||m[0].length<1) { closeAC(); return; }
+  const word=m[0];
+  const bank = mode==='gkode' ? AC_GC : AC_JS;
+  acMatches = bank.filter(c=>c.l.toUpperCase().startsWith(word.toUpperCase())&&c.l!==word).slice(0,10);
+  if (!acMatches.length) { closeAC(); return; }
+  acIdx=0; renderAC(); posAC(pos);
+}
+
+function renderAC() {
+  acMenu.innerHTML = acMatches.map((c,i)=>`
+    <div class="ac-item${i===acIdx?' sel':''}" data-i="${i}">
+      <span class="ac-kind">${c.k}</span>
+      <span class="ac-label">${c.l}</span>
+      <span class="ac-detail">${c.d}</span>
+    </div>`).join('');
+  acMenu.querySelectorAll('.ac-item').forEach(el=>
+    el.addEventListener('mousedown',e=>{e.preventDefault();acIdx=+el.dataset.i;acApply();}));
+  acMenu.style.display='block';
+}
+
+function posAC(pos) {
+  const before=editor.value.substring(0,pos).split('\n');
+  const ln=before.length-1, col=before[ln].length;
+  const lh=12.5*1.72;
+  const top=Math.max(0, ln*lh+14-editor.scrollTop+2);
+  const left=48+Math.min(col*7.5+2, document.getElementById('editor-area').offsetWidth-260);
+  acMenu.style.top=top+'px'; acMenu.style.left=left+'px';
+}
+function acMove(d) { acIdx=(acIdx+d+acMatches.length)%acMatches.length; renderAC(); }
+function acApply() {
+  const item=acMatches[acIdx]; if(!item) return;
+  const pos=editor.selectionStart, text=editor.value.substring(0,pos);
+  const m=text.match(/[A-Za-z][A-Za-z0-9.]*$/); if(!m) return;
+  const start=pos-m[0].length;
+  editor.value=editor.value.substring(0,start)+item.l+editor.value.substring(pos);
+  editor.selectionStart=editor.selectionEnd=start+item.l.length;
+  closeAC(); syncGutter();
+}
+function closeAC() { acMenu.style.display='none'; }
+
+/* ══════════════════════════════════════════
+   FIND
+══════════════════════════════════════════ */
+let findMs=[], findIdx=0;
+function openFind() { findBar.classList.add('open'); findInput.focus(); doFind(); }
+function closeFind() { findBar.classList.remove('open'); findInput.value=''; findCount.textContent=''; }
+document.getElementById('btn-find').addEventListener('click', openFind);
+document.getElementById('find-close').addEventListener('click', closeFind);
+document.getElementById('find-prev').addEventListener('click', ()=>{ findIdx=(findIdx-1+findMs.length)%findMs.length; jumpFind(); });
+document.getElementById('find-next').addEventListener('click', ()=>{ findIdx=(findIdx+1)%findMs.length; jumpFind(); });
+findInput.addEventListener('input', doFind);
+function doFind() {
+  const q=findInput.value; findMs=[];
+  if(!q){findCount.textContent='';return;}
+  let p=0,t=editor.value;
+  while((p=t.indexOf(q,p))!==-1){findMs.push(p);p+=q.length;}
+  findCount.textContent=findMs.length?`${findIdx+1}/${findMs.length}`:'none';
+  findIdx=0; jumpFind();
+}
+function jumpFind() {
+  if(!findMs.length) return;
+  editor.selectionStart=findMs[findIdx];
+  editor.selectionEnd=findMs[findIdx]+findInput.value.length;
+  editor.focus();
+  findCount.textContent=`${findIdx+1}/${findMs.length}`;
+}
+
+/* ══════════════════════════════════════════
+   FORMAT
+══════════════════════════════════════════ */
+document.getElementById('btn-format').addEventListener('click', () => {
+  if (mode==='gkode') { formatGcode(); return; }
+  const lines=editor.value.split('\n');
+  let ind=0, out=[];
+  for (const l of lines) {
+    const t=l.trim(); if(!t){out.push('');continue;}
+    const cl=(t.match(/^[}\])]/))||[]).length;
+    ind=Math.max(0,ind-cl);
+    out.push('  '.repeat(ind)+t);
+    ind=Math.max(0,ind+(t.match(/[{[(]/g)||[]).length-(t.match(/[}\])]/g)||[]).length+cl);
+  }
+  editor.value=out.join('\n');
+  syncGutter(); updateMinimap(); showToast('Formatted · KOFFEE');
+});
+
+function formatGcode() {
+  const lines=editor.value.split('\n');
+  const out=lines.map(l=>{
+    const t=l.trim();
+    if(!t||t.startsWith(';')) return l;
+    // uppercase G/M/X/Y/Z/F/S/I/J/R/T + normalise spaces
+    return t.replace(/([A-Z])(\s*)(-?\d)/gi,(m,c,s,n)=>c.toUpperCase()+n).replace(/\s{2,}/g,' ');
+  });
+  editor.value=out.join('\n');
+  syncGutter(); showToast('Formatted · G-KODE');
+}
+
+/* ══════════════════════════════════════════
+   LINT
+══════════════════════════════════════════ */
+let wCnt=0,eCnt=0;
+function lint() {
+  wCnt=0; eCnt=0;
+  if (mode==='koffee') {
+    if(editor.value.includes('var ')) wCnt++;
+    if(editor.value.includes('eval(')) wCnt++;
+    try{new Function(editor.value);}catch(e){eCnt++;}
+  } else {
+    // G-code lint: check for missing M30, unmatched canned cycles
+    const txt=editor.value;
+    if(!txt.includes('M30')&&!txt.includes('M2')) wCnt++;
+    const g8x=(txt.match(/G8[0-9]/gi)||[]).length;
+    const g80=(txt.match(/G80/gi)||[]).length;
+    if(g8x>g80) wCnt++;
+    // Check for Z moves without safe height
+    if((txt.match(/G0/gi)||[]).length && !(txt.match(/Z\d/gi)||[]).length) wCnt++;
+  }
+  sbErrors.textContent=`✕ ${eCnt}  ▲ ${wCnt}`;
+  sbErrors.style.color=eCnt?'#000':wCnt?'rgba(0,0,0,0.6)':'inherit';
+}
+
+/* ══════════════════════════════════════════
+   SERIALISE VALUES
+══════════════════════════════════════════ */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(v) {
+  if(v===null)      return `<span class="val-null">null</span>`;
+  if(v===undefined) return `<span class="val-null">undefined</span>`;
+  if(typeof v==='number')  return `<span class="val-num">${v}</span>`;
+  if(typeof v==='boolean') return `<span class="val-bool">${v}</span>`;
+  if(typeof v==='string')  return `<span class="val-str">${esc(JSON.stringify(v))}</span>`;
+  if(v instanceof Error)   return `<span class="val-null">${esc(v.stack||v.toString())}</span>`;
+  try{return `<span class="val-obj">${esc(JSON.stringify(v,null,2))}</span>`;}
+  catch{return `<span class="val-obj">${esc(String(v))}</span>`;}
+}
+function serArgs(args){return args.map(a=>fmt(a)).join(' ');}
+
+/* ══════════════════════════════════════════
+   ADD LOG LINE
+══════════════════════════════════════════ */
+let logN=0;
+function addLog(type,args,ic='') {
+  logN++;
+  const ts=new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const d=document.createElement('div');
+  d.className=`log log-${type}`;
+  d.innerHTML=`<span class="log-n">${logN}</span><span class="log-ic">${ic}</span><span class="log-msg">${serArgs(args)}</span><span class="log-ts">${ts}</span>`;
+  conPane.appendChild(d);
+  conPane.scrollTop=conPane.scrollHeight;
+}
+
+function clearConsole() {
+  conPane.innerHTML=`<div class="console-empty"><div class="kode-glyph">.KODE</div>Console cleared<div class="empty-hint">Ctrl+Enter to run</div></div>`;
+  execBadge.textContent=''; execBadge.className='';
+  logN=0;
+}
+
+/* ══════════════════════════════════════════
+   RUN / PREVIEW
+══════════════════════════════════════════ */
+function runCode() {
+  if (mode==='gkode') { previewGcode(); return; }
+  runJS();
+}
+
+/* ── KOFFEE: run JS ── */
+function runJS() {
+  conPane.innerHTML=''; logN=0;
+  const oLog=console.log,oWarn=console.warn,oErr=console.error,oGrp=console.group,oTbl=console.table;
+  console.log  =(...a)=>{oLog(...a);   addLog('info',  a);}
+  console.warn =(...a)=>{oWarn(...a);  addLog('warn',  a);}
+  console.error=(...a)=>{oErr(...a);   addLog('error', a);}
+  console.group=(...a)=>{oGrp(...a);   addLog('group', a,'▸ ');}
+  console.table=(...a)=>{oTbl(...a);   addLog('info',  a,'⊞ ');}
+  const t0=performance.now();
+  try {
+    const ret=new Function(editor.value)();
+    const ms=(performance.now()-t0).toFixed(2);
+    if(ret!==undefined) addLog('result',[ret]);
+    if(!logN) {
+      conPane.innerHTML=`<div class="console-empty"><div class="kode-glyph">.KODE</div>Ran · no output<div class="empty-hint">${ms}ms</div></div>`;
+    }
+    execBadge.textContent=`⏱ ${ms}ms`; execBadge.className='ok';
+    document.getElementById('editor-area').classList.add('run-flash');
+    setTimeout(()=>document.getElementById('editor-area').classList.remove('run-flash'),400);
+  } catch(err) {
+    addLog('error',[err]); execBadge.textContent='ERROR'; execBadge.className='err';
+  } finally {
+    console.log=oLog;console.warn=oWarn;console.error=oErr;console.group=oGrp;console.table=oTbl;
+  }
+}
+
+/* ── G-KODE: parse + preview ── */
+function previewGcode() {
+  conPane.innerHTML=''; logN=0;
+  const lines=editor.value.split('\n');
+  const moves=[];
+  let cx=0,cy=0,cz=0, rapid=true;
+  let lineCount=0, warnCount=0, errCount=0;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  let totalFeed=0,feedCount=0;
+  let modalAbs=true;
+
+  for (let i=0;i<lines.length;i++) {
+    const raw=lines[i];
+    const l=raw.replace(/;.*/,'').trim().toUpperCase();
+    if(!l) continue;
+    lineCount++;
+
+    // Modal
+    if(/\bG90\b/.test(l)) modalAbs=true;
+    if(/\bG91\b/.test(l)) modalAbs=false;
+    if(/\bG20\b/.test(l)) addLog('warn',['Line '+(i+1)+': G20 inch mode detected — params in mm']);
+
+    // Parse word values
+    const gw=n=>{const m=l.match(new RegExp(n+'(-?[0-9.]+)'));return m?parseFloat(m[1]):null;};
+
+    // Movement
+    const isG0=/\bG0\b/.test(l)||/\bG00\b/.test(l);
+    const isG1=/\bG1\b/.test(l)||/\bG01\b/.test(l);
+    const isG2=/\bG2\b/.test(l)||/\bG02\b/.test(l);
+    const isG3=/\bG3\b/.test(l)||/\bG03\b/.test(l);
+
+    if(isG0||isG1||isG2||isG3) {
+      const nx=gw('X')??cx, ny=gw('Y')??cy, nz=gw('Z')??cz;
+      const feed=gw('F'); if(feed){totalFeed+=feed;feedCount++;}
+
+      if(isG2||isG3) {
+        // Arc — approximate as 16-segment polyline
+        const ii=gw('I')??0, jj=gw('J')??0;
+        const ar=Math.hypot(ii,jj);
+        if(ar>0) {
+          const startA=Math.atan2(-jj,-ii);
+          const endA  =Math.atan2(ny-cy-jj,nx-cx-ii);
+          let span=isG2?(startA-endA):(endA-startA);
+          while(span<0)span+=Math.PI*2;
+          while(span>Math.PI*2)span-=Math.PI*2;
+          if(span===0)span=Math.PI*2;
+          const segs=Math.max(12,Math.round(span*ar*4));
+          for(let s=0;s<=segs;s++){
+            const t=s/segs;
+            const a=isG2?startA-span*t:startA+span*t;
+            const px=(cx+ii)+Math.cos(a)*ar, py=(cy+jj)+Math.sin(a)*ar;
+            moves.push({x:px,y:py,z:cz,r:false});
+            minX=Math.min(minX,px);maxX=Math.max(maxX,px);
+            minY=Math.min(minY,py);maxY=Math.max(maxY,py);
+          }
+        }
+      } else {
+        moves.push({x:nx,y:ny,z:nz,r:isG0});
+        minX=Math.min(minX,nx);maxX=Math.max(maxX,nx);
+        minY=Math.min(minY,ny);maxY=Math.max(maxY,ny);
+      }
+      cx=nx; cy=ny; cz=nz;
+
+      // Z-dive check
+      if(nz<0&&cz>=0) addLog('gcode',['Line '+(i+1)+': Z plunge → '+nz.toFixed(3)+'mm']);
+    }
+
+    // M-codes
+    if(/\bM3\b|\bM03\b/.test(l)) addLog('gcode',['Line '+(i+1)+': Spindle ON CW  S='+(gw('S')??'—')]);
+    if(/\bM5\b|\bM05\b/.test(l)) addLog('gcode',['Line '+(i+1)+': Spindle OFF']);
+    if(/\bM6\b|\bM06\b/.test(l)) addLog('gcode',['Line '+(i+1)+': Tool Change  T='+(gw('T')??'—')]);
+    if(/\bM30\b/.test(l))        addLog('gcode',['Line '+(i+1)+': Program END ✓']);
+  }
+
+  // Stats
+  const stats={
+    lines:lineCount,
+    moves:moves.length,
+    bounds:{
+      x:[isFinite(minX)?+minX.toFixed(3):0, isFinite(maxX)?+maxX.toFixed(3):0],
+      y:[isFinite(minY)?+minY.toFixed(3):0, isFinite(maxY)?+maxY.toFixed(3):0],
+    },
+    avgFeed: feedCount? +(totalFeed/feedCount).toFixed(0) : 0,
+  };
+  addLog('gcode',['Parsed: '+lineCount+' lines · '+moves.length+' moves']);
+  addLog('gcode',['Bounds X: '+stats.bounds.x+' · Y: '+stats.bounds.y]);
+
+  tpStat.textContent = moves.length+' moves';
+  drawToolpath(moves);
+  execBadge.textContent='✓ '+moves.length+' moves'; execBadge.className='ok';
+  document.getElementById('editor-area').classList.add('run-flash');
+  setTimeout(()=>document.getElementById('editor-area').classList.remove('run-flash'),400);
+}
+
+/* ── TOOLPATH CANVAS ── */
+function drawToolpath(moves) {
+  const cv=tpCanvas;
+  const W=cv.offsetWidth||200, H=cv.offsetHeight||300;
+  cv.width=W; cv.height=H;
+  const ctx=tpCtx;
+
+  ctx.fillStyle='#080b12'; ctx.fillRect(0,0,W,H);
+
+  if(!moves.length) return;
+
+  // Bounds
+  let mnX=Infinity,mxX=-Infinity,mnY=Infinity,mxY=-Infinity;
+  for(const m of moves){mnX=Math.min(mnX,m.x);mxX=Math.max(mxX,m.x);mnY=Math.min(mnY,m.y);mxY=Math.max(mxY,m.y);}
+  const pad=14;
+  const scX=(W-pad*2)/Math.max(mxX-mnX,0.1);
+  const scY=(H-pad*2)/Math.max(mxY-mnY,0.1);
+  const sc=Math.min(scX,scY);
+  const offX=pad+(W-pad*2-(mxX-mnX)*sc)/2;
+  const offY=pad+(H-pad*2-(mxY-mnY)*sc)/2;
+
+  const tx=x=>offX+(x-mnX)*sc;
+  const ty=y=>H-(offY+(y-mnY)*sc); // flip Y
+
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+  for(let gx=Math.ceil(mnX/10)*10;gx<=mxX;gx+=10){
+    ctx.beginPath();ctx.moveTo(tx(gx),0);ctx.lineTo(tx(gx),H);ctx.stroke();
+  }
+  for(let gy=Math.ceil(mnY/10)*10;gy<=mxY;gy+=10){
+    ctx.beginPath();ctx.moveTo(0,ty(gy));ctx.lineTo(W,ty(gy));ctx.stroke();
+  }
+
+  // Moves
+  ctx.lineWidth=1;
+  for(let i=1;i<moves.length;i++){
+    const a=moves[i-1],b=moves[i];
+    ctx.strokeStyle=b.r?'rgba(255,170,0,0.3)':b.z<0?'rgba(0,255,157,0.85)':'rgba(43,134,197,0.7)';
+    ctx.beginPath();ctx.moveTo(tx(a.x),ty(a.y));ctx.lineTo(tx(b.x),ty(b.y));ctx.stroke();
+  }
+
+  // Start marker
+  if(moves.length){
+    ctx.fillStyle='#ffaa00';
+    ctx.beginPath();ctx.arc(tx(moves[0].x),ty(moves[0].y),3,0,Math.PI*2);ctx.fill();
+  }
+  // End marker
+  if(moves.length>1){
+    const last=moves[moves.length-1];
+    ctx.fillStyle='#ff4455';
+    ctx.beginPath();ctx.arc(tx(last.x),ty(last.y),3,0,Math.PI*2);ctx.fill();
+  }
+
+  // Legend
+  ctx.font='8px Fira Code,monospace'; ctx.fillStyle='rgba(255,170,0,0.7)';
+  ctx.fillText('○ start', 6, H-22);
+  ctx.fillStyle='rgba(255,68,102,0.7)';
+  ctx.fillText('● end', 6, H-10);
+}
+
+/* Resize toolpath canvas when pane resizes */
+function resizeTP() {
+  const cv=tpCanvas;
+  cv.width=cv.offsetWidth; cv.height=cv.offsetHeight;
+}
+
+document.getElementById('btn-run').addEventListener('click', runCode);
+document.getElementById('btn-clear').addEventListener('click', () => { clearConsole(); showToast('Console cleared'); });
+
+/* ══════════════════════════════════════════
+   RESIZER
+══════════════════════════════════════════ */
+let rsz=false,rszY=0,rszH=0;
+resizer.addEventListener('mousedown',e=>{
+  rsz=true;rszY=e.clientY;rszH=outPanel.offsetHeight;
+  resizer.classList.add('drag');
+  document.body.style.userSelect='none';document.body.style.cursor='ns-resize';
+});
+document.addEventListener('mousemove',e=>{
+  if(!rsz)return;
+  outPanel.style.height=Math.max(54,Math.min(600,rszH+rszY-e.clientY))+'px';
+});
+document.addEventListener('mouseup',()=>{
+  rsz=false;resizer.classList.remove('drag');
+  document.body.style.userSelect='';document.body.style.cursor='';
+});
+
+/* ══════════════════════════════════════════
+   MINIMAP
+══════════════════════════════════════════ */
+function updateMinimap() {
+  const lines=editor.value.split('\n');
+  const W=60,LH=2.6,PAD=4;
+  mmCanvas.width=W; mmCanvas.height=Math.max(200,lines.length*LH+PAD*2);
+  mmCtx.fillStyle='#080b12'; mmCtx.fillRect(0,0,W,mmCanvas.height);
+  lines.forEach((l,i)=>{
+    const y=PAD+i*LH;
+    const len=Math.min(l.trimEnd().length*0.5,W-6);
+    if(len<1)return;
+    let col='#1e2a3a';
+    if(/^\s*(\/\/|;)/.test(l))col='#1a2e2e';
+    else if(mode==='gkode'){
+      if(/^\s*G0\b/.test(l.toUpperCase()))col='#2a1e00';
+      else if(/^\s*G[12]\b/.test(l.toUpperCase()))col='#002a1a';
+      else if(/^\s*M/.test(l.toUpperCase()))col='#2a0010';
+    } else {
+      if(/\b(const|let|function|class|async|return)\b/.test(l))col='#162340';
+      else if(/console\./.test(l))col='#162a20';
+    }
+    mmCtx.fillStyle=col; mmCtx.fillRect(4,y,len,LH-0.4);
+  });
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+let toastT;
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('on'),2500);
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+syncGutter();
+updateCursor();
+updateMinimap();
+lint();
+
+clearConsole();
+setTimeout(runCode, 350);
+
+// Resize toolpath canvas on window resize
+window.addEventListener('resize', ()=>{ updateMinimap(); });
+</script>
+</body>
+</html>
