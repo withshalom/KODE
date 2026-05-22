@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>.KODE — Kernel-Oriented Development Environment</title>
+<title>KODE — Kernel-Oriented Development Environment</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap');
 
@@ -240,7 +240,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);
 
 /* ── G-KODE PREVIEW PANE ── */
 #gkode-preview{
-  display:none;width:200px;
+  display:none;width:280px;
   background:var(--panel);border-left:1px solid var(--border);
   flex-direction:column;flex-shrink:0;overflow:hidden;
 }
@@ -476,6 +476,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);
   </button>
 
   <div class="tb-right">
+    <!-- KAM integration buttons — shown in G-KODE mode -->
+    <input type="file" id="load-kam-nc" accept=".kam,.nc,.NC" onchange="loadKAMFile(event)" style="display:none">
+    <button class="tbb" id="btn-open-kam" onclick="document.getElementById('load-kam-nc').click()" title="Open .kam or .nc file">
+      <svg viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
+      Open
+    </button>
+    <button class="tbb" id="btn-return-kam" onclick="returnToKAM()" title="Return edited NC to KAM session" style="color:var(--gk-b)">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      → KAM
+    </button>
+    <button class="tbb" id="btn-dl-nc" onclick="downloadNC()" title="Download .nc file" style="color:var(--gk-a)">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      .nc
+    </button>
+    <div class="tb-div"></div>
     <button class="btn-clear" id="btn-clear">⊘ Clear</button>
     <button class="btn-run" id="btn-run">
       <svg viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9"/></svg>
@@ -564,6 +579,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);
   <span id="sb-mode">● JS</span>
   <span id="sb-cursor">Ln 1, Col 1</span>
   <span id="sb-sel"></span>
+  <span id="sb-kam-sync" style="font-weight:600;"></span>
   <div class="sb-r">
     <span id="sb-errors">✕ 0 &nbsp;▲ 0</span>
     <span>UTF-8</span>
@@ -607,6 +623,108 @@ const otParams  = document.getElementById('ot-params');
 
 /* ── MODE STATE ── */
 let mode = 'koffee'; // 'koffee' | 'gkode'
+
+// ── KAM SESSION (loaded from localStorage when KAM sends to KODE) ────────────
+let KODE_KAM = null;  // full .kam payload when loaded
+let KODE_NC  = null;  // raw NC text when loaded from KAM
+
+function loadKAMSession() {
+  try {
+    const raw = localStorage.getItem('kam_session');
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    if (d.app !== 'kam') return false;
+    KODE_KAM = d;
+    KODE_NC  = d.nc || null;
+    return true;
+  } catch(e) { return false; }
+}
+
+function clearKAMSession() {
+  localStorage.removeItem('kam_session');
+  KODE_KAM = null; KODE_NC = null;
+  updateKAMStatusBar();
+  showToast('KAM session cleared');
+}
+
+function updateKAMStatusBar() {
+  const el = document.getElementById('sb-kam-sync');
+  if (!el) return;
+  if (!KODE_KAM) { el.textContent = ''; el.style.color = ''; return; }
+  const k = KODE_KAM.kode || {};
+  // Check if NC in editor matches stored hash
+  const curHash = hashStr(editor.value);
+  const synced  = k.nc_hash && curHash === k.nc_hash;
+  el.textContent = synced ? '✓ KAM Sync' : '⚠ NC Modified';
+  el.style.color  = synced ? 'rgba(0,0,0,0.75)' : 'rgba(255,68,102,0.9)';
+}
+
+// Simple djb2 hash (matches KAM's hashStr)
+function hashStr(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+  return (h >>> 0).toString(16);
+}
+
+// Export edited NC back to localStorage (so KAM can pick it up)
+function returnToKAM() {
+  if (!KODE_KAM) { showToast('No KAM session loaded'); return; }
+  const nc = editor.value;
+  KODE_KAM.nc = nc;
+  KODE_KAM.kode = KODE_KAM.kode || {};
+  KODE_KAM.kode.nc_hash   = hashStr(nc);
+  KODE_KAM.kode.nc_synced = false;  // mark as externally modified
+  KODE_KAM.kode.last_kode = new Date().toISOString();
+  localStorage.setItem('kam_session', JSON.stringify(KODE_KAM));
+  updateKAMStatusBar();
+  showToast('NC returned to KAM session — reload KAM to import');
+}
+
+function downloadNC() {
+  const job = KODE_KAM ? (KODE_KAM.job?.number || 'program') : 'program';
+  const blob = new Blob([editor.value], {type:'text/plain'});
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob), download: job + '.nc'
+  });
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  showToast('Downloaded ' + job + '.nc');
+}
+
+function loadKAMFile(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (d.app === 'kam') {
+        KODE_KAM = d;
+        KODE_NC  = d.nc || null;
+        if (d.nc) { setMode('gkode'); editor.value = d.nc; syncGutter(); updateMinimap(); }
+        updateKAMStatusBar();
+        const name = d.meta?.session || file.name;
+        const objs = d.objects?.length || 0;
+        const tags = Object.keys(d.contourTags||{}).length;
+        showToast(`Loaded KAM: ${name} · ${objs} entities · ${tags} contours`);
+      } else {
+        // Plain .nc file
+        KODE_NC = e.target.result;
+        setMode('gkode');
+        editor.value = e.target.result;
+        syncGutter(); updateMinimap();
+        showToast('Loaded ' + file.name);
+      }
+    } catch(err) {
+      // Try as plain text NC
+      KODE_NC = e.target.result;
+      setMode('gkode');
+      editor.value = e.target.result;
+      syncGutter(); updateMinimap();
+      showToast('Loaded ' + file.name + ' as NC');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
 
 const KOFFEE_CODE = `// .KODE · KOFFEE mode — JavaScript REPL
 // ▶ Run  or  Ctrl+Enter
@@ -961,10 +1079,10 @@ document.getElementById('btn-format').addEventListener('click', () => {
   let ind=0, out=[];
   for (const l of lines) {
     const t=l.trim(); if(!t){out.push('');continue;}
-    const cl=(t.match(/^[}\])]/))||[]).length;
+    const cl=(t.startsWith('}')||t.startsWith(']')||t.startsWith(')'))?1:0;
     ind=Math.max(0,ind-cl);
     out.push('  '.repeat(ind)+t);
-    ind=Math.max(0,ind+(t.match(/[{[(]/g)||[]).length-(t.match(/[}\])]/g)||[]).length+cl);
+    const opens=(t.match(/[{[(]/g)||[]).length; const closes=(t.match(/[}\])]/g)||[]).length; ind=Math.max(0,ind+opens-closes+cl);
   }
   editor.value=out.join('\n');
   syncGutter(); updateMinimap(); showToast('Formatted · KOFFEE');
@@ -1060,8 +1178,22 @@ function runJS() {
   console.group=(...a)=>{oGrp(...a);   addLog('group', a,'▸ ');}
   console.table=(...a)=>{oTbl(...a);   addLog('info',  a,'⊞ ');}
   const t0=performance.now();
+  // Expose KAM API to KOFFEE scripts
+  const KAM_API = KODE_KAM ? {
+    contours: KODE_KAM.contourTags || {},
+    sequence: KODE_KAM.cutSequence || [],
+    machine:  KODE_KAM.machine  || {},
+    material: KODE_KAM.material || {},
+    job:      KODE_KAM.job      || {},
+    objects:  KODE_KAM.objects  || [],
+    meta:     KODE_KAM.meta     || {},
+    nc:       KODE_NC           || '',
+  } : null;
+
   try {
-    const ret=new Function(editor.value)();
+    const KAM = KAM_API; // expose as 'KAM' in script scope
+    const NC  = KODE_NC ? { text: KODE_NC, lines: KODE_NC.split('\n') } : null;
+    const ret = new Function('KAM','NC', editor.value)(KAM, NC);
     const ms=(performance.now()-t0).toFixed(2);
     if(ret!==undefined) addLog('result',[ret]);
     if(!logN) {
@@ -1077,158 +1209,258 @@ function runJS() {
   }
 }
 
-/* ── G-KODE: parse + preview ── */
+/* ── G-KODE: parse + preview (plasma/router aware) ── */
 function previewGcode() {
   conPane.innerHTML=''; logN=0;
-  const lines=editor.value.split('\n');
-  const moves=[];
-  let cx=0,cy=0,cz=0, rapid=true;
+  const lines = editor.value.split('\n');
+  const moves = [];
+  let cx=0,cy=0,cz=0;
   let lineCount=0, warnCount=0, errCount=0;
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
   let totalFeed=0,feedCount=0;
   let modalAbs=true;
+  let torchOn=false, kerfComp='G40';
+  let hasM30=false, hasPierceDelay=false, hasLeadIn=false, hasKerfComp=false;
+  let pierceCount=0, torchOnCount=0;
 
-  for (let i=0;i<lines.length;i++) {
-    const raw=lines[i];
-    const l=raw.replace(/;.*/,'').trim().toUpperCase();
-    if(!l) continue;
+  const isPlasma = KODE_KAM
+    ? (KODE_KAM.machine?.dialect||'').toLowerCase().includes('plasma') ||
+      (KODE_KAM.machine?.dialect||'').toLowerCase().includes('hypertherm') ||
+      (KODE_KAM.machine?.dialect||'').toLowerCase().includes('burny') ||
+      (KODE_KAM.machine?.dialect||'').toLowerCase().includes('dynatorch') ||
+      true  // default: treat as plasma in KAM context
+    : false;
+
+  for (let i=0; i<lines.length; i++) {
+    const raw = lines[i];
+    const l   = raw.replace(/([;%]).*/,'').trim().toUpperCase();
+    if (!l) continue;
     lineCount++;
 
-    // Modal
-    if(/\bG90\b/.test(l)) modalAbs=true;
-    if(/\bG91\b/.test(l)) modalAbs=false;
-    if(/\bG20\b/.test(l)) addLog('warn',['Line '+(i+1)+': G20 inch mode detected — params in mm']);
+    // Modals
+    if (/\bG90\b/.test(l)) modalAbs = true;
+    if (/\bG91\b/.test(l)) modalAbs = false;
+    if (/\bG20\b/.test(l)) { addLog('warn',['Line '+(i+1)+': G20 inch mode — verify units']); warnCount++; }
+    if (/\bG21\b/.test(l)) { /* metric OK */ }
 
-    // Parse word values
-    const gw=n=>{const m=l.match(new RegExp(n+'(-?[0-9.]+)'));return m?parseFloat(m[1]):null;};
+    // Kerf compensation
+    if (/\bG41\b/.test(l)) { kerfComp='G41'; hasKerfComp=true; }
+    if (/\bG42\b/.test(l)) { kerfComp='G42'; hasKerfComp=true; }
+    if (/\bG40\b/.test(l)) { kerfComp='G40'; }
 
-    // Movement
-    const isG0=/\bG0\b/.test(l)||/\bG00\b/.test(l);
-    const isG1=/\bG1\b/.test(l)||/\bG01\b/.test(l);
-    const isG2=/\bG2\b/.test(l)||/\bG02\b/.test(l);
-    const isG3=/\bG3\b/.test(l)||/\bG03\b/.test(l);
+    // Parse word extractor
+    const gw = n => { const m=l.match(new RegExp(n+'([+-]?[0-9]*\\.?[0-9]+)')); return m ? parseFloat(m[1]) : null; };
 
-    if(isG0||isG1||isG2||isG3) {
-      const nx=gw('X')??cx, ny=gw('Y')??cy, nz=gw('Z')??cz;
-      const feed=gw('F'); if(feed){totalFeed+=feed;feedCount++;}
+    // Movement codes
+    const isG0  = /\bG0[0]?\b/.test(l);
+    const isG1  = /\bG0?1\b/.test(l);
+    const isG2  = /\bG0?2\b/.test(l);
+    const isG3  = /\bG0?3\b/.test(l);
 
-      if(isG2||isG3) {
-        // Arc — approximate as 16-segment polyline
-        const ii=gw('I')??0, jj=gw('J')??0;
-        const ar=Math.hypot(ii,jj);
-        if(ar>0) {
-          const startA=Math.atan2(-jj,-ii);
-          const endA  =Math.atan2(ny-cy-jj,nx-cx-ii);
-          let span=isG2?(startA-endA):(endA-startA);
-          while(span<0)span+=Math.PI*2;
-          while(span>Math.PI*2)span-=Math.PI*2;
+    if (isG0||isG1||isG2||isG3) {
+      const nx = gw('X') ?? cx;
+      const ny = gw('Y') ?? cy;
+      const nz = gw('Z') ?? cz;
+      const feed = gw('F');
+      if (feed) { totalFeed+=feed; feedCount++; }
+
+      if (isG2||isG3) {
+        // Arc with I/J offsets — full arc math
+        const ii=gw('I')??0, jj=gw('J')??0, rr=gw('R');
+        let ar, startA, endA, span;
+        if (rr != null) {
+          // R-word arc
+          ar = Math.abs(rr);
+          const dx=nx-cx, dy=ny-cy, d=Math.hypot(dx,dy);
+          const h=Math.sqrt(ar*ar-(d/2)*(d/2));
+          const mx=cx+dx/2, my=cy+dy/2;
+          const nx2=isG2? mx+h*dy/d : mx-h*dy/d;
+          const ny2=isG2? my-h*dx/d : my+h*dx/d;
+          startA=Math.atan2(cy-ny2,cx-nx2);
+          endA  =Math.atan2(ny-ny2,nx-nx2);
+          span  =isG2?(startA-endA):(endA-startA);
+          if(span<0)span+=Math.PI*2;
           if(span===0)span=Math.PI*2;
-          const segs=Math.max(12,Math.round(span*ar*4));
+        } else {
+          ar=Math.hypot(ii,jj);
+          startA=Math.atan2(-jj,-ii);
+          endA  =Math.atan2(ny-cy-jj,nx-cx-ii);
+          span  =isG2?(startA-endA):(endA-startA);
+          while(span<0)span+=Math.PI*2; while(span>Math.PI*2)span-=Math.PI*2;
+          if(span===0)span=Math.PI*2;
+        }
+        if(ar>0.001) {
+          const segs=Math.max(16,Math.round(span*ar*5));
+          const ocx=cx+ii, ocy=cy+jj;
           for(let s=0;s<=segs;s++){
-            const t=s/segs;
-            const a=isG2?startA-span*t:startA+span*t;
-            const px=(cx+ii)+Math.cos(a)*ar, py=(cy+jj)+Math.sin(a)*ar;
-            moves.push({x:px,y:py,z:cz,r:false});
-            minX=Math.min(minX,px);maxX=Math.max(maxX,px);
-            minY=Math.min(minY,py);maxY=Math.max(maxY,py);
+            const t=s/segs, a=isG2?startA-span*t:startA+span*t;
+            const px=ocx+Math.cos(a)*ar, py=ocy+Math.sin(a)*ar;
+            moves.push({x:px,y:py,z:cz,rapid:false,torch:torchOn,arc:true});
+            minX=Math.min(minX,px);maxX=Math.max(maxX,px);minY=Math.min(minY,py);maxY=Math.max(maxY,py);
           }
+          if(span>=Math.PI*1.9) hasLeadIn=true; // full circle = lead-in arc
         }
       } else {
-        moves.push({x:nx,y:ny,z:nz,r:isG0});
-        minX=Math.min(minX,nx);maxX=Math.max(maxX,nx);
-        minY=Math.min(minY,ny);maxY=Math.max(maxY,ny);
+        moves.push({x:nx,y:ny,z:nz,rapid:isG0,torch:torchOn,arc:false});
+        minX=Math.min(minX,nx);maxX=Math.max(maxX,nx);minY=Math.min(minY,ny);maxY=Math.max(maxY,ny);
       }
       cx=nx; cy=ny; cz=nz;
-
-      // Z-dive check
-      if(nz<0&&cz>=0) addLog('gcode',['Line '+(i+1)+': Z plunge → '+nz.toFixed(3)+'mm']);
     }
 
-    // M-codes
-    if(/\bM3\b|\bM03\b/.test(l)) addLog('gcode',['Line '+(i+1)+': Spindle ON CW  S='+(gw('S')??'—')]);
-    if(/\bM5\b|\bM05\b/.test(l)) addLog('gcode',['Line '+(i+1)+': Spindle OFF']);
-    if(/\bM6\b|\bM06\b/.test(l)) addLog('gcode',['Line '+(i+1)+': Tool Change  T='+(gw('T')??'—')]);
-    if(/\bM30\b/.test(l))        addLog('gcode',['Line '+(i+1)+': Program END ✓']);
+    // ── M-codes — plasma vs router ────────────────────────────────────────
+    // Plasma: M07/M08 = torch on, M09/M05 = torch off, G4 = pierce delay
+    // Router: M03 = spindle on, M05 = spindle off
+    const isM07=/\bM0?7\b/.test(l), isM08=/\bM0?8\b/.test(l);
+    const isM09=/\bM0?9\b/.test(l);
+    const isM03=/\bM0?3\b/.test(l), isM05=/\bM0?5\b/.test(l);
+    const isM06=/\bM0?6\b/.test(l), isM30=/\bM30\b/.test(l), isM02=/\bM02\b/.test(l);
+    const isG4 =/\bG0?4\b/.test(l);
+
+    if (isM07||isM08) {
+      torchOn=true; torchOnCount++;
+      addLog('gcode',['Line '+(i+1)+': Torch ON '+(isM07?'(M07)':'(M08)')]);
+    }
+    if (isM09) {
+      torchOn=false;
+      addLog('gcode',['Line '+(i+1)+': Torch OFF (M09)']);
+    }
+    if (isM03&&!isPlasma) addLog('gcode',['Line '+(i+1)+': Spindle CW  S='+(gw('S')??'—')]);
+    if (isM05&&!isPlasma&&!torchOn) addLog('gcode',['Line '+(i+1)+': Spindle OFF']);
+    if (isM06) addLog('gcode',['Line '+(i+1)+': Tool Change T='+(gw('T')??'—')]);
+
+    if (isG4) {
+      const p=gw('P')??gw('X')??0;
+      hasPierceDelay=true; pierceCount++;
+      addLog('gcode',['Line '+(i+1)+': Pierce Delay '+p+(p>1?'s':'ms')]);
+    }
+
+    if (isM30||isM02) { hasM30=true; addLog('gcode',['Line '+(i+1)+': Program END ✓']); }
+
+    // ── Plasma-specific warnings ──────────────────────────────────────────
+    if (isM07||isM08) {
+      if (kerfComp==='G40') {
+        addLog('warn',['Line '+(i+1)+': Torch ON with no kerf comp (G40) — check G41/G42']);
+        warnCount++;
+      }
+    }
   }
 
-  // Stats
-  const stats={
-    lines:lineCount,
-    moves:moves.length,
-    bounds:{
-      x:[isFinite(minX)?+minX.toFixed(3):0, isFinite(maxX)?+maxX.toFixed(3):0],
-      y:[isFinite(minY)?+minY.toFixed(3):0, isFinite(maxY)?+maxY.toFixed(3):0],
-    },
-    avgFeed: feedCount? +(totalFeed/feedCount).toFixed(0) : 0,
-  };
-  addLog('gcode',['Parsed: '+lineCount+' lines · '+moves.length+' moves']);
-  addLog('gcode',['Bounds X: '+stats.bounds.x+' · Y: '+stats.bounds.y]);
+  // ── End-of-file checks ────────────────────────────────────────────────────
+  if (!hasM30)      { addLog('error',['Missing M30 / M02 — program end not found']); errCount++; }
+  if (isPlasma) {
+    if (!hasKerfComp) { addLog('warn',['No G41/G42 kerf compensation found']); warnCount++; }
+    if (!hasPierceDelay&&torchOnCount>0) { addLog('warn',['No pierce delay (G4) found — torch may blow through material']); warnCount++; }
+    if (!hasLeadIn&&torchOnCount>0) { addLog('warn',['No full-arc lead-in detected — consider adding G2/G3 lead-in']); warnCount++; }
+    if (torchOnCount > pierceCount) {
+      addLog('warn',['Torch ON count ('+torchOnCount+') > Pierce delays ('+pierceCount+') — some contours may lack pierce']); warnCount++;
+    }
+    if (KODE_KAM) {
+      const taggedCount = Object.keys(KODE_KAM.contourTags||{}).length;
+      if (taggedCount > 0 && torchOnCount !== taggedCount) {
+        addLog('warn',['KAM has '+taggedCount+' tagged contours but NC has '+torchOnCount+' torch cycles — mismatch']);
+        warnCount++;
+      }
+    }
+  }
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
+  const avgF = feedCount ? +(totalFeed/feedCount).toFixed(0) : 0;
+  addLog('gcode',['Parsed: '+lineCount+' lines · '+moves.length+' moves · '+torchOnCount+' cuts']);
+  addLog('gcode',['Bounds X: ['+(isFinite(minX)?minX.toFixed(2):0)+', '+(isFinite(maxX)?maxX.toFixed(2):0)+']  Y: ['+(isFinite(minY)?minY.toFixed(2):0)+', '+(isFinite(maxY)?maxY.toFixed(2):0)+']']);
+  if (avgF) addLog('gcode',['Avg feed: '+avgF+' units/min']);
+  if (KODE_KAM) addLog('gcode',['KAM session: '+
+    (KODE_KAM.meta?.session||'untitled')+' · '+
+    (KODE_KAM.machine?.name||'unknown machine')+' · '+
+    (KODE_KAM.material?.grade||'?')+' '+
+    (KODE_KAM.material?.thickness||'?')+'in']);
+
+  wCnt=warnCount; eCnt=errCount;
+  sbErrors.textContent=`✕ ${eCnt}  ▲ ${wCnt}`;
+  sbErrors.style.color=eCnt?'#000':wCnt?'rgba(0,0,0,0.65)':'inherit';
 
   tpStat.textContent = moves.length+' moves';
-  drawToolpath(moves);
+  drawToolpath(moves, KODE_KAM);
   execBadge.textContent='✓ '+moves.length+' moves'; execBadge.className='ok';
   document.getElementById('editor-area').classList.add('run-flash');
   setTimeout(()=>document.getElementById('editor-area').classList.remove('run-flash'),400);
+  updateKAMStatusBar();
 }
-
 /* ── TOOLPATH CANVAS ── */
-function drawToolpath(moves) {
+function drawToolpath(moves, kamCtx) {
   const cv=tpCanvas;
-  const W=cv.offsetWidth||200, H=cv.offsetHeight||300;
+  const W=cv.offsetWidth||280, H=cv.offsetHeight||300;
   cv.width=W; cv.height=H;
   const ctx=tpCtx;
-
-  ctx.fillStyle='#080b12'; ctx.fillRect(0,0,W,H);
-
+  ctx.fillStyle='#06070e'; ctx.fillRect(0,0,W,H);
   if(!moves.length) return;
 
-  // Bounds
+  // Compute bounds from NC moves + KAM geometry if present
   let mnX=Infinity,mxX=-Infinity,mnY=Infinity,mxY=-Infinity;
   for(const m of moves){mnX=Math.min(mnX,m.x);mxX=Math.max(mxX,m.x);mnY=Math.min(mnY,m.y);mxY=Math.max(mxY,m.y);}
-  const pad=14;
-  const scX=(W-pad*2)/Math.max(mxX-mnX,0.1);
-  const scY=(H-pad*2)/Math.max(mxY-mnY,0.1);
-  const sc=Math.min(scX,scY);
+  if(kamCtx?.objects) {
+    for(const o of kamCtx.objects){
+      if(o.type==='LINE'){mnX=Math.min(mnX,o.x1,o.x2);mxX=Math.max(mxX,o.x1,o.x2);mnY=Math.min(mnY,o.y1,o.y2);mxY=Math.max(mxY,o.y1,o.y2);}
+      if(o.type==='POLYLINE')for(const p of o.pts){mnX=Math.min(mnX,p.x);mxX=Math.max(mxX,p.x);mnY=Math.min(mnY,p.y);mxY=Math.max(mxY,p.y);}
+    }
+  }
+
+  const pad=18;
+  const sc=Math.min((W-pad*2)/Math.max(mxX-mnX,0.1),(H-pad*2)/Math.max(mxY-mnY,0.1));
   const offX=pad+(W-pad*2-(mxX-mnX)*sc)/2;
   const offY=pad+(H-pad*2-(mxY-mnY)*sc)/2;
-
   const tx=x=>offX+(x-mnX)*sc;
-  const ty=y=>H-(offY+(y-mnY)*sc); // flip Y
+  const ty=y=>H-(offY+(y-mnY)*sc);
 
   // Grid
-  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
-  for(let gx=Math.ceil(mnX/10)*10;gx<=mxX;gx+=10){
-    ctx.beginPath();ctx.moveTo(tx(gx),0);ctx.lineTo(tx(gx),H);ctx.stroke();
-  }
-  for(let gy=Math.ceil(mnY/10)*10;gy<=mxY;gy+=10){
-    ctx.beginPath();ctx.moveTo(0,ty(gy));ctx.lineTo(W,ty(gy));ctx.stroke();
+  const gStep = [0.5,1,2,5,10,20,50,100,200].find(s=>s*sc>=24)||100;
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=0.5;
+  for(let gx=Math.floor(mnX/gStep)*gStep;gx<=mxX;gx+=gStep){ctx.beginPath();ctx.moveTo(tx(gx),0);ctx.lineTo(tx(gx),H);ctx.stroke();}
+  for(let gy=Math.floor(mnY/gStep)*gStep;gy<=mxY;gy+=gStep){ctx.beginPath();ctx.moveTo(0,ty(gy));ctx.lineTo(W,ty(gy));ctx.stroke();}
+
+  // ── KAM geometry overlay (amber, behind NC moves) ────────────────────────
+  if(kamCtx?.objects) {
+    ctx.save();
+    for(const o of kamCtx.objects){
+      const tag = kamCtx.contourTags?.[o.id];
+      const col = tag ? (tag.side==='inside'?'rgba(0,255,157,0.25)':'rgba(255,170,0,0.25)') : 'rgba(255,255,255,0.08)';
+      ctx.strokeStyle=col; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath();
+      if(o.type==='LINE'){ctx.moveTo(tx(o.x1),ty(o.y1));ctx.lineTo(tx(o.x2),ty(o.y2));}
+      if(o.type==='POLYLINE'){
+        if(!o.pts.length) continue;
+        ctx.moveTo(tx(o.pts[0].x),ty(o.pts[0].y));
+        for(let j=1;j<o.pts.length;j++) ctx.lineTo(tx(o.pts[j].x),ty(o.pts[j].y));
+        if(o.closed) ctx.closePath();
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]); ctx.restore();
   }
 
-  // Moves
-  ctx.lineWidth=1;
+  // ── NC toolpath (solid, on top) ───────────────────────────────────────────
+  ctx.lineWidth=1.2;
   for(let i=1;i<moves.length;i++){
     const a=moves[i-1],b=moves[i];
-    ctx.strokeStyle=b.r?'rgba(255,170,0,0.3)':b.z<0?'rgba(0,255,157,0.85)':'rgba(43,134,197,0.7)';
+    if(b.rapid)          ctx.strokeStyle='rgba(255,170,0,0.28)';
+    else if(b.torch)     ctx.strokeStyle='rgba(0,255,157,0.90)';
+    else                 ctx.strokeStyle='rgba(43,134,197,0.70)';
     ctx.beginPath();ctx.moveTo(tx(a.x),ty(a.y));ctx.lineTo(tx(b.x),ty(b.y));ctx.stroke();
   }
 
-  // Start marker
+  // Start / End markers
   if(moves.length){
-    ctx.fillStyle='#ffaa00';
-    ctx.beginPath();ctx.arc(tx(moves[0].x),ty(moves[0].y),3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ffaa00';ctx.beginPath();ctx.arc(tx(moves[0].x),ty(moves[0].y),3.5,0,Math.PI*2);ctx.fill();
   }
-  // End marker
   if(moves.length>1){
     const last=moves[moves.length-1];
-    ctx.fillStyle='#ff4455';
-    ctx.beginPath();ctx.arc(tx(last.x),ty(last.y),3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ff4455';ctx.beginPath();ctx.arc(tx(last.x),ty(last.y),3.5,0,Math.PI*2);ctx.fill();
   }
 
   // Legend
-  ctx.font='8px Fira Code,monospace'; ctx.fillStyle='rgba(255,170,0,0.7)';
-  ctx.fillText('○ start', 6, H-22);
-  ctx.fillStyle='rgba(255,68,102,0.7)';
-  ctx.fillText('● end', 6, H-10);
+  ctx.font='8px Fira Code,monospace';
+  ctx.fillStyle='rgba(0,255,157,0.8)';  ctx.fillText('─ cut',    5, H-34);
+  ctx.fillStyle='rgba(255,170,0,0.7)';  ctx.fillText('─ rapid',  5, H-22);
+  ctx.fillStyle='rgba(255,170,0,0.4)';  ctx.fillText('- KAM geo',5, H-10);
 }
 
 /* Resize toolpath canvas when pane resizes */
@@ -1302,9 +1534,19 @@ syncGutter();
 updateCursor();
 updateMinimap();
 lint();
-
 clearConsole();
-setTimeout(runCode, 350);
+
+// Auto-load KAM session if sent from KAM
+if (loadKAMSession()) {
+  setMode('gkode');
+  if (KODE_NC) { editor.value = KODE_NC; syncGutter(); updateMinimap(); }
+  updateKAMStatusBar();
+  setTimeout(previewGcode, 400);
+  const s = KODE_KAM.meta?.session || 'session';
+  showToast('KAM session loaded: ' + s);
+} else {
+  setTimeout(runCode, 350);
+}
 
 // Resize toolpath canvas on window resize
 window.addEventListener('resize', ()=>{ updateMinimap(); });
