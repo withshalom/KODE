@@ -10,13 +10,14 @@
   --void:#05060a;--bg:#080b12;--panel:#0b0f18;--panel2:#0e1420;
   --glass:rgba(8,11,18,0.95);--hover:rgba(255,255,255,0.04);
   --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.13);
-  --kf-a:#00d4ff;--kf-b:#b06ee6;--kf-c:#ff3cac;
+  --kf-a:#d4aa78;--kf-b:#f2e8d0;--kf-c:#b88848;
   --gk-a:#ffaa00;--gk-b:#00ff9d;--gk-c:#ff4455;
   --green:#00ff9d;--amber:#ffaa00;--red:#ff4455;--blue:#2b86c5;
   --t1:#dde8f5;--t2:#7080a0;--t3:#384860;--t4:#1a2535;
   --fm:'Fira Code',monospace;--fd:'Syne',sans-serif;
   --acc:var(--kf-a);--acc-b:var(--kf-b);--acc-c:var(--kf-c);
 }
+body.mode-koffee{--acc:var(--kf-a);--acc-b:var(--kf-b);--acc-c:var(--kf-c);}
 body.mode-gkode{--acc:var(--gk-a);--acc-b:var(--gk-b);--acc-c:var(--gk-c);}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:var(--t1);font-family:var(--fd);font-size:13px;-webkit-font-smoothing:antialiased;}
@@ -24,7 +25,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 #topbar{height:44px;flex-shrink:0;display:flex;align-items:center;gap:0;background:var(--glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border);padding:0 10px;z-index:60;overflow:hidden;}
 .brand{display:flex;align-items:center;gap:8px;margin-right:12px;flex-shrink:0;cursor:default;user-select:none;}
 .brand-mark{width:30px;height:30px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-weight:600;font-size:8px;color:#000;letter-spacing:0.04em;transition:all 0.4s;}
-.mode-koffee .brand-mark{background:linear-gradient(135deg,var(--kf-a),var(--kf-c));box-shadow:0 0 18px rgba(0,212,255,0.4);}
+..mode-koffee .brand-mark{background:linear-gradient(135deg,#d4aa78,#f2e8d0);box-shadow:0 0 16px rgba(212,170,120,0.5);}
 .mode-gkode  .brand-mark{background:linear-gradient(135deg,var(--gk-a),var(--gk-b));box-shadow:0 0 18px rgba(255,170,0,0.4);}
 .brand-col{line-height:1.1;}
 .brand-name{font-family:var(--fd);font-weight:800;font-size:14px;letter-spacing:-0.02em;transition:all 0.4s;}
@@ -34,14 +35,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .tb-div{width:1px;height:18px;background:var(--border);margin:0 5px;flex-shrink:0;}
 .mode-toggle{display:flex;align-items:center;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:3px;flex-shrink:0;}
 .mode-btn{padding:4px 10px;font-family:var(--fm);font-size:9px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border-radius:5px;cursor:pointer;border:none;background:transparent;color:var(--t3);transition:all 0.2s;white-space:nowrap;}
-.mode-btn.active.koffee{background:linear-gradient(90deg,rgba(0,212,255,0.18),rgba(255,60,172,0.18));color:var(--kf-a);}
+.mode-btn.active.koffee{background:linear-gradient(90deg,rgba(212,170,120,0.32),rgba(242,232,208,0.22));color:#d4aa78;box-shadow:0 0 10px rgba(212,170,120,0.25),inset 0 0 0 1px rgba(212,170,120,0.3);}
 .mode-btn.active.gkode{background:linear-gradient(90deg,rgba(255,170,0,0.18),rgba(0,255,157,0.18));color:var(--gk-a);}
 .tbb{height:28px;padding:0 8px;display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:10px;color:var(--t2);background:none;border:none;border-radius:5px;cursor:pointer;transition:all 0.12s;letter-spacing:0.03em;white-space:nowrap;}
 .tbb:hover{color:var(--t1);background:var(--hover);}
 .tbb svg{width:11px;height:11px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.6;}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:5px;}
 .btn-run{height:28px;padding:0 13px;display:flex;align-items:center;gap:6px;font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:0.06em;border:none;border-radius:5px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
-.mode-koffee .btn-run{background:linear-gradient(90deg,var(--kf-a),var(--blue));color:#000;box-shadow:0 0 14px rgba(0,212,255,0.3);}
+.mode-koffee .btn-run{background:linear-gradient(90deg,var(--kf-a),var(--blue));color:#000;box-shadow:0 0 14px rgba(212,170,120,0.3);}
 .mode-gkode  .btn-run{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));color:#000;box-shadow:0 0 14px rgba(255,170,0,0.3);}
 .btn-run:hover{filter:brightness(1.15);}
 .btn-run svg{width:9px;height:9px;fill:#000;stroke:none;}
@@ -91,7 +92,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 #editor-stack{flex:1;position:relative;overflow:hidden;}
 #hl-layer{position:absolute;top:0;left:0;right:0;bottom:0;padding:14px 16px;font-family:var(--fm);font-size:12.5px;line-height:1.72;pointer-events:none;white-space:pre;overflow:hidden;tab-size:2;letter-spacing:0.01em;color:transparent;z-index:1;}
 #editor{position:absolute;top:0;left:0;right:0;bottom:0;padding:14px 16px;font-family:var(--fm);font-size:12.5px;line-height:1.72;background:var(--bg);color:var(--t1);border:none;outline:none;resize:none;tab-size:2;white-space:pre;overflow-y:auto;overflow-x:auto;caret-color:var(--acc);letter-spacing:0.01em;scrollbar-width:thin;scrollbar-color:var(--border) transparent;z-index:2;}
-#editor::selection{background:rgba(0,212,255,0.16);}
+#editor::selection{background:rgba(212,170,120,0.22);}
 .mode-gkode #editor::selection{background:rgba(255,170,0,0.14);}
 #right-pane{width:72px;background:var(--bg);border-left:1px solid var(--border);overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;}
 #mm-canvas{display:block;}
@@ -161,7 +162,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .mode-gkode  .kode-glyph{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .empty-hint{color:var(--t4);font-size:10px;}
 #statusbar{height:24px;flex-shrink:0;display:flex;align-items:center;padding:0 12px;gap:14px;font-family:var(--fm);font-size:10px;font-weight:500;color:rgba(0,0,0,0.75);letter-spacing:0.04em;transition:background 0.4s;}
-.mode-koffee #statusbar{background:linear-gradient(90deg,rgba(0,212,255,0.88),rgba(176,110,230,0.88),rgba(255,60,172,0.88));}
+..mode-koffee #statusbar{background:linear-gradient(90deg,rgba(212,170,120,0.85),rgba(242,232,208,0.72));}
 .mode-gkode  #statusbar{background:linear-gradient(90deg,rgba(255,170,0,0.88),rgba(0,255,157,0.88));}
 #statusbar .sb-r{margin-left:auto;display:flex;gap:14px;}
 /* syntax highlight */
@@ -218,8 +219,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
   </div>
   <div class="tb-div"></div>
   <div class="mode-toggle">
-    <button class="mode-btn koffee active" id="btn-koffee">☕ KOFFEE</button>
-    <button class="mode-btn gkode"         id="btn-gkode">⚙ G-KODE</button>
+    <button class="mode-btn gkode active"  id="btn-gkode">⚙ G-KODE</button>
+    <button class="mode-btn koffee"        id="btn-koffee">☕ KF</button>
   </div>
   <div class="tb-div"></div>
   <button class="tbb" id="btn-snip" title="Snippets (Ctrl+J)">
@@ -381,12 +382,12 @@ const outPanel = document.getElementById('output-panel');
 const sidePanel= document.getElementById('side-panel');
 const spBody   = document.getElementById('sp-body');
 
-let mode = 'koffee';
+let mode = 'gkode';
 let simRunning=false, simFrame=null, simIdx=0, simMoves=[];
 let tabIdCtr=1, activeTabId=0;
 
 /* ── DEFAULT CODE ── */
-const KOFFEE_CODE=`// .KODE · KOFFEE — JavaScript REPL
+const KOFFEE_CODE=`// .KODE · ☕ KF — KOFFEE JavaScript REPL
 // ▶ Run  or  Ctrl+Enter to execute
 
 // ── Output ────────────────────────────────────
@@ -554,14 +555,14 @@ function setMode(m,silent){
   document.getElementById('btn-koffee').classList.toggle('active',!gk);
   document.getElementById('btn-gkode').classList.toggle('active',gk);
   document.getElementById('run-label').textContent=gk?'Preview':'Run';
-  document.getElementById('brand-sub').textContent=gk?'g-code editor + preview':'kernel-oriented dev env';
-  document.getElementById('brand-mark').textContent=gk?'GK':'KD';
+  document.getElementById('brand-sub').textContent=gk?'g-code editor + preview':'koffee javascript repl';
+  document.getElementById('brand-mark').textContent=gk?'GK':'KF';
   sbMode.textContent=gk?'● G-code':'● JS';
   document.getElementById('sb-unit').textContent=gk?'G21 mm':'2 spaces';
   document.getElementById('ot-machine').style.display=gk?'':'none';
   document.getElementById('bc-lang').textContent=gk?'G-code':'JavaScript';
   buildSidePanel();
-  if(!silent){clearConsole();showToast(gk?'⚙ G-KODE — CNC G-code editor':'☕ KOFFEE — JavaScript REPL');}
+  if(!silent){clearConsole();showToast(gk?'⚙ G-KODE — CNC G-code editor':'☕ KF — KOFFEE JavaScript REPL');}
   syncGutter();updateMinimap();lint();applyHL();
 }
 
