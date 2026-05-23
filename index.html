@@ -25,17 +25,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 #topbar{height:44px;flex-shrink:0;display:flex;align-items:center;gap:0;background:var(--glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border);padding:0 10px;z-index:60;overflow:hidden;}
 .brand{display:flex;align-items:center;gap:8px;margin-right:12px;flex-shrink:0;cursor:default;user-select:none;}
 .brand-mark{width:30px;height:30px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-weight:600;font-size:8px;color:#000;letter-spacing:0.04em;transition:all 0.4s;}
-..mode-koffee .brand-mark{background:linear-gradient(135deg,#d4aa78,#f2e8d0);box-shadow:0 0 16px rgba(212,170,120,0.5);}
+..mode-koffee .brand-mark{background:linear-gradient(135deg,#d4aa78 0%,#f2e8d0 60%,#d4aa78 100%);box-shadow:0 0 20px rgba(212,170,120,0.6);}
 .mode-gkode  .brand-mark{background:linear-gradient(135deg,var(--gk-a),var(--gk-b));box-shadow:0 0 18px rgba(255,170,0,0.4);}
 .brand-col{line-height:1.1;}
 .brand-name{font-family:var(--fd);font-weight:800;font-size:14px;letter-spacing:-0.02em;transition:all 0.4s;}
-.mode-koffee .brand-name{background:linear-gradient(90deg,var(--kf-a),var(--kf-b),var(--kf-c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-koffee .brand-name{background:linear-gradient(90deg,#d4aa78,#f2e8d0,#d4aa78);background-size:200% auto;animation:kfPan 4s ease-in-out infinite alternate;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .mode-gkode  .brand-name{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .brand-sub{font-family:var(--fm);font-size:7px;color:var(--t3);letter-spacing:0.16em;text-transform:uppercase;margin-top:2px;}
 .tb-div{width:1px;height:18px;background:var(--border);margin:0 5px;flex-shrink:0;}
 .mode-toggle{display:flex;align-items:center;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:3px;flex-shrink:0;}
 .mode-btn{padding:4px 10px;font-family:var(--fm);font-size:9px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border-radius:5px;cursor:pointer;border:none;background:transparent;color:var(--t3);transition:all 0.2s;white-space:nowrap;}
-.mode-btn.active.koffee{background:linear-gradient(90deg,rgba(212,170,120,0.32),rgba(242,232,208,0.22));color:#d4aa78;box-shadow:0 0 10px rgba(212,170,120,0.25),inset 0 0 0 1px rgba(212,170,120,0.3);}
+.mode-btn.active.koffee{background:linear-gradient(90deg,#d4aa78,#f2e8d0);color:#1a100a;font-weight:600;box-shadow:0 0 14px rgba(212,170,120,0.4),inset 0 0 0 1px rgba(212,170,120,0.5);}
 .mode-btn.active.gkode{background:linear-gradient(90deg,rgba(255,170,0,0.18),rgba(0,255,157,0.18));color:var(--gk-a);}
 .tbb{height:28px;padding:0 8px;display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:10px;color:var(--t2);background:none;border:none;border-radius:5px;cursor:pointer;transition:all 0.12s;letter-spacing:0.03em;white-space:nowrap;}
 .tbb:hover{color:var(--t1);background:var(--hover);}
@@ -162,7 +162,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .mode-gkode  .kode-glyph{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .empty-hint{color:var(--t4);font-size:10px;}
 #statusbar{height:24px;flex-shrink:0;display:flex;align-items:center;padding:0 12px;gap:14px;font-family:var(--fm);font-size:10px;font-weight:500;color:rgba(0,0,0,0.75);letter-spacing:0.04em;transition:background 0.4s;}
-..mode-koffee #statusbar{background:linear-gradient(90deg,rgba(212,170,120,0.85),rgba(242,232,208,0.72));}
+..mode-koffee #statusbar{background:linear-gradient(90deg,#d4aa78,#f2e8d0,#b88848);opacity:0.95;}
 .mode-gkode  #statusbar{background:linear-gradient(90deg,rgba(255,170,0,0.88),rgba(0,255,157,0.88));}
 #statusbar .sb-r{margin-left:auto;display:flex;gap:14px;}
 /* syntax highlight */
@@ -201,6 +201,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@keyframes kfPan{0%{background-position:0% center}100%{background-position:100% center}}
 @keyframes rflash{0%{box-shadow:inset 0 0 0 1px var(--acc);}100%{box-shadow:none;}}
 .run-flash{animation:rflash 0.4s ease-out;}
 #toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--panel2);border:1px solid var(--border-hi);border-radius:6px;padding:6px 14px;font-family:var(--fm);font-size:11px;color:var(--t1);letter-spacing:0.04em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s,transform 0.2s;backdrop-filter:blur(12px);z-index:300;}
@@ -1075,7 +1076,17 @@ function clearConsole(){
 /* ══════════════════════════════
    RUN
 ══════════════════════════════ */
-function runCode(){mode==='gkode'?previewGcode():runJS();}
+function runCode(){
+  if(mode==='gkode'){
+    // Only parse as G-code if content looks like G-code (has G/M/T codes)
+    const txt = edEl.value || '';
+    const isGcode = /^\s*[GMT]\d|^\s*%|^\s*\(/m.test(txt);
+    if(isGcode) previewGcode();
+    else { clearConsole(); addLog('gcode',['No G-code detected — switch to ☕ KF for JavaScript']); }
+  } else {
+    runJS();
+  }
+}
 
 function runJS(){
   conPane.innerHTML='';logN=0;
@@ -1556,7 +1567,17 @@ updateMinimap();
 applyHL();
 lint();
 clearConsole();
-setTimeout(runCode,400);
+// Only auto-run if content matches the current mode
+setTimeout(()=>{
+  const txt = edEl.value || '';
+  if(mode==='gkode'){
+    const isGcode = /^\s*[GMT]\d|^\s*%/m.test(txt);
+    if(isGcode) previewGcode();
+    // else: leave console clean — no false warnings on JS content
+  } else {
+    runJS();
+  }
+},400);
 window.addEventListener('resize',updateMinimap);
 </script>
 </body>
