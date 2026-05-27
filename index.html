@@ -92,8 +92,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 #work-area{flex:1;display:flex;min-height:0;overflow:hidden;}
 
 /* ── SIDE PANEL ── */
-#side-panel{width:0;overflow:hidden;transition:width 0.25s;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
-#side-panel.open{width:188px;}
+#side-panel{width:188px;overflow:hidden;transition:width 0.25s;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+#side-panel.open{width:188px;} /* already open by default */
 .sp-head{padding:8px 10px;font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;}
 .sp-head em{color:var(--acc);font-style:normal;}
 .sp-body{flex:1;overflow-y:auto;padding:6px;}
@@ -285,6 +285,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .run-flash{animation:rflash 0.4s ease-out;}
 #toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--panel2);border:1px solid var(--border-hi);border-radius:6px;padding:6px 14px;font-family:var(--fm);font-size:11px;color:var(--t1);letter-spacing:0.04em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s,transform 0.2s;backdrop-filter:blur(12px);z-index:300;}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── File ops panel (matches KAD/KAM pattern) ───────────── */
+.op-btn{display:flex;align-items:center;gap:8px;padding:6px 10px;
+  background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+  color:var(--t2);font-size:11px;font-family:var(--fm);cursor:pointer;
+  transition:all 0.15s;letter-spacing:0.04em;width:100%;}
+.op-btn:hover{background:var(--hover);border-color:var(--border-hi);color:var(--t1);}
+.op-btn svg{width:12px;height:12px;flex-shrink:0;}
+.op-btn.nc  {color:#cc1133;border-color:rgba(204,17,51,0.25);}
+.op-btn.nc:hover {background:rgba(204,17,51,0.06);border-color:#cc1133;}
+.op-btn.js  {color:#d4aa78;border-color:rgba(212,170,120,0.25);}
+.op-btn.js:hover {background:rgba(212,170,120,0.06);border-color:#d4aa78;}
+.op-btn.htm {color:#f2e8d0;border-color:rgba(242,232,208,0.2);}
+.op-btn.htm:hover{background:rgba(242,232,208,0.05);border-color:#f2e8d0;}
+.kode-file-ops{padding:6px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border);}
 </style>
 </head>
 <body class="mode-gkode">
@@ -330,10 +345,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
     <span class="sim-lbl" id="sim-spd-lbl">×6</span>
   </div>
   <div class="tb-right">
-    <input type="file" id="load-file" accept=".nc,.NC,.gcode,.js,.html,.htm,.kam" onchange="loadFile(event)" style="display:none">
-    <button class="tbb" id="btn-open" title="Open file (.nc · .js · .html)" onclick="document.getElementById('load-file').click()">
-      <svg viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
-    </button>
+
     <button class="btn-sm danger" id="btn-clear">⊘</button>
     <button class="btn-run" id="btn-run">
       <svg viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9"/></svg>
@@ -347,6 +359,52 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 <div id="body">
   <div id="work-area">
     <div id="side-panel">
+      <div class="sp-head">File</div>
+      <div class="kode-file-ops">
+        <!-- Save current file (preserves name + extension) -->
+        <button class="op-btn" onclick="exportFile()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Save file
+        </button>
+        <!-- Open any supported file -->
+        <button class="op-btn" onclick="document.getElementById('load-file').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Open file
+        </button>
+        <input type="file" id="load-file" accept=".nc,.NC,.gcode,.js,.html,.htm,.kam" onchange="loadFile(event)" style="display:none">
+      </div>
+      <div class="sp-head">Download as</div>
+      <div class="kode-file-ops">
+        <button class="op-btn nc" onclick="downloadAs('nc')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Download .nc
+        </button>
+        <button class="op-btn js" onclick="downloadAs('js')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Download .js
+        </button>
+        <button class="op-btn htm" onclick="downloadAs('html')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Download .html
+        </button>
+      </div>
       <div class="sp-head"><em id="sp-title">Snippets</em></div>
       <div class="sp-body" id="sp-body"></div>
     </div>
@@ -1546,6 +1604,21 @@ lint();
 clearConsole();
 setTimeout(()=>{ if(mode==='koffee') runJS(); },400);
 window.addEventListener('resize',updateMinimap);
+
+
+function downloadAs(ext) {
+  const cur = tabs.find(t => t.id === activeTabId);
+  const base = cur ? cur.name.replace(/\.[^.]+$/, '') : 'file';
+  const name = base + '.' + ext;
+  const type = ext === 'html' ? 'text/html' :
+               ext === 'js'   ? 'text/javascript' : 'text/plain';
+  const blob = new Blob([edEl.value], { type });
+  const a    = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  URL.revokeObjectURL(a.href);
+  if (cur) { cur.name = name; cur.modified = false; renderTabs(); }
+  showToast('Downloaded · ' + name);
+}
 </script>
 </body>
 </html>
