@@ -313,7 +313,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
   <button class="tbb" id="btn-format" title="Format (Alt+F)">
     <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
   </button>
-  <button class="tbb" id="btn-export" title="Export (Ctrl+S)">
+  <button class="tbb" id="btn-saveas" title="Save As (Ctrl+Shift+S)" onclick="saveAs()">
+    <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+  </button>
+  <button class="tbb" id="btn-export" title="Download file (Ctrl+S)">
     <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
   </button>
   <button class="tbb" id="btn-keys" title="Shortcuts (?)">
@@ -327,8 +330,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
     <span class="sim-lbl" id="sim-spd-lbl">×6</span>
   </div>
   <div class="tb-right">
-    <input type="file" id="load-file" accept=".js,.html,.htm,.nc,.NC,.kam" onchange="loadFile(event)" style="display:none">
-    <button class="tbb" id="btn-open" title="Open file" onclick="document.getElementById('load-file').click()">
+    <input type="file" id="load-file" accept=".nc,.NC,.gcode,.js,.html,.htm,.kam" onchange="loadFile(event)" style="display:none">
+    <button class="tbb" id="btn-open" title="Open file (.nc · .js · .html)" onclick="document.getElementById('load-file').click()">
       <svg viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
     </button>
     <button class="btn-sm danger" id="btn-clear">⊘</button>
@@ -928,7 +931,8 @@ edEl.addEventListener('keydown',e=>{
   const ctrl=e.ctrlKey||e.metaKey;
   if(ctrl&&e.key==='Enter'){e.preventDefault();runCode();return;}
   if(ctrl&&e.key==='f'){e.preventDefault();openFind();return;}
-  if(ctrl&&e.key==='s'){e.preventDefault();exportFile();return;}
+  if(ctrl&&e.key==='s'&&!e.shiftKey){e.preventDefault();exportFile();return;}
+  if(ctrl&&e.shiftKey&&e.key==='S'){e.preventDefault();saveAs();return;}
   if(ctrl&&e.key==='t'){e.preventDefault();newTab();return;}
   if(ctrl&&e.key==='w'){e.preventDefault();closeTab(activeTabId);return;}
   if(ctrl&&e.key==='l'){e.preventDefault();clearConsole();return;}
@@ -1404,6 +1408,23 @@ function exportFile(){
   URL.revokeObjectURL(a.href);
   showToast('Exported · '+name);
   if(cur){cur.modified=false;renderTabs();}
+}
+
+function saveAs() {
+  const cur = tabs.find(t => t.id === activeTabId);
+  const defaultName = cur ? cur.name : 'file.nc';
+  const name = window.prompt('Save as:', defaultName);
+  if (!name) return;
+  const ext = name.split('.').pop().toLowerCase();
+  const type = ext === 'html' || ext === 'htm' ? 'text/html' :
+               ext === 'js'   ? 'text/javascript' : 'text/plain';
+  const blob = new Blob([edEl.value], { type });
+  const a    = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  URL.revokeObjectURL(a.href);
+  // Rename the tab
+  if (cur) { cur.name = name; cur.modified = false; renderTabs(); }
+  showToast('Saved · ' + name);
 }
 
 function loadFile(event){
