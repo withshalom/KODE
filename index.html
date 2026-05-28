@@ -300,6 +300,73 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .op-btn.htm {color:#f2e8d0;border-color:rgba(242,232,208,0.2);}
 .op-btn.htm:hover{background:rgba(242,232,208,0.05);border-color:#f2e8d0;}
 .kode-file-ops{padding:6px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border);}
+
+/* ── Resize handle ─────────────────────────────────────────── */
+#resize-handle {
+  height:5px; cursor:ns-resize; flex-shrink:0;
+  background:var(--border); transition:background 0.15s;
+  position:relative;
+}
+#resize-handle:hover, #resize-handle.dragging { background:var(--acc); }
+#resize-handle::after {
+  content:''; position:absolute; left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  width:32px; height:1px; background:var(--border-hi); border-radius:1px;
+}
+
+/* ── Toolpath canvas pane ──────────────────────────────────── */
+#toolpath-pane {
+  display:none; flex:1; position:relative; background:#05060a;
+  overflow:hidden;
+}
+#toolpath-pane.visible { display:flex; }
+#toolpath-canvas { display:block; width:100%; height:100%; }
+#tp-info {
+  position:absolute; top:8px; left:8px;
+  font-family:var(--fm); font-size:9px; color:rgba(200,160,80,0.85);
+  letter-spacing:0.06em; pointer-events:none; line-height:1.6;
+}
+#tp-sendkam {
+  position:absolute; top:8px; right:8px;
+  padding:4px 10px; background:rgba(204,17,51,0.15);
+  border:1px solid var(--gk-a); border-radius:3px;
+  font-family:var(--fm); font-size:9px; color:var(--gk-a);
+  cursor:pointer; transition:all 0.15s; letter-spacing:0.06em;
+}
+#tp-sendkam:hover { background:rgba(204,17,51,0.28); }
+
+/* ── G-code library pane ───────────────────────────────────── */
+#lib-pane {
+  display:none; flex-direction:column; flex:1; overflow:hidden;
+  background:var(--panel);
+}
+#lib-pane.visible { display:flex; }
+#lib-search {
+  margin:6px 8px 4px; padding:4px 8px;
+  background:var(--panel2); border:1px solid var(--border-hi);
+  border-radius:3px; color:var(--t1); font-family:var(--fm);
+  font-size:10px; outline:none;
+}
+#lib-search:focus { border-color:var(--acc); }
+#lib-table {
+  flex:1; overflow-y:auto; font-family:var(--fm);
+  font-size:9.5px;
+}
+.lib-row {
+  display:grid; grid-template-columns:52px 80px 1fr;
+  gap:0; padding:5px 8px; border-bottom:1px solid var(--border);
+  cursor:pointer; transition:background 0.1s; align-items:start;
+}
+.lib-row:hover { background:var(--hover); }
+.lib-code { color:var(--acc); font-weight:600; letter-spacing:0.06em; }
+.lib-name { color:var(--t2); }
+.lib-desc { color:var(--t3); font-size:8.5px; margin-top:1px; }
+.lib-group-head {
+  padding:3px 8px; font-size:8px; letter-spacing:0.16em;
+  text-transform:uppercase; color:var(--t4);
+  background:var(--panel2); border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:1;
+}
 </style>
 </head>
 <body class="mode-gkode">
@@ -379,7 +446,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
           </svg>
           Open file
         </button>
-        <input type="file" id="load-file" accept=".nc,.NC,.gcode,.js,.html,.htm,.kam" onchange="loadFile(event)" style="display:none">
+        <input type="file" id="load-file" accept=".nc,.NC,.gcode,.js,.html,.htm,.kam,.txt,.TXT" onchange="loadFile(event)" style="display:none">
       </div>
       <div class="sp-head">Download as</div>
       <div class="kode-file-ops">
@@ -463,14 +530,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
     </div>
   </div>
   <div id="resizer"></div>
-  <div id="output-panel">
+  <div id="resize-handle" id="rh"></div>
+<div id="output-panel">
     <div id="out-tabs">
-      <div class="out-tab active" id="ot-console">Console</div>
+      <div class="out-tab active" id="ot-console">KONSOLE</div><div class="out-tab" id="ot-toolpath">TOOLPATH</div><div class="out-tab" id="ot-lib">LIB</div>
       <div class="out-tab" id="ot-issues">Issues</div>
       <div class="out-tab" id="ot-machine" style="display:none">Machine</div>
       <span id="exec-badge"></span>
     </div>
     <div id="console-pane"></div>
+    <div id="toolpath-pane">
+      <canvas id="toolpath-canvas"></canvas>
+      <div id="tp-info"></div>
+      <button id="tp-sendkam" onclick="sendToKAM()">→ KAM</button>
+    </div>
+    <div id="lib-pane"><input id="lib-search" placeholder="Search G/M codes…" oninput="filterLib(this.value)"><div id="lib-table"></div></div>
   </div>
 </div>
 </div>
@@ -509,6 +583,279 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 <div id="toast"></div>
 
 <script>
+const GCODE_LIB = [
+  // Motion
+  {code:'G00',group:'Motion',    name:'Rapid Move',        desc:'Moves to position at max machine speed without cutting',           params:'X Y Z',        ex:'G00 X0 Y0'},
+  {code:'G01',group:'Motion',    name:'Linear Cut',         desc:'Linear move at programmed feed rate (cutting)',                    params:'X Y Z F',      ex:'G01 X50 Y30 F800'},
+  {code:'G02',group:'Motion',    name:'Arc CW',             desc:'Clockwise circular interpolation. I,J = centre offsets from start',params:'X Y I J F',    ex:'G02 X20 Y0 I10 J0 F600'},
+  {code:'G03',group:'Motion',    name:'Arc CCW',            desc:'Counter-clockwise circular interpolation',                         params:'X Y I J F',    ex:'G03 X0 Y20 I0 J10 F600'},
+  {code:'G04',group:'Motion',    name:'Dwell',              desc:'Pause execution for P milliseconds (or S seconds)',                params:'P or S',       ex:'G04 P500'},
+  // Units
+  {code:'G20',group:'Units',     name:'Inch Mode',          desc:'All subsequent coordinates are in inches',                         params:'',             ex:'G20'},
+  {code:'G21',group:'Units',     name:'Metric Mode',        desc:'All subsequent coordinates are in millimetres',                    params:'',             ex:'G21'},
+  // Position
+  {code:'G28',group:'Position',  name:'Home',               desc:'Return to machine home position',                                  params:'',             ex:'G28'},
+  {code:'G90',group:'Position',  name:'Absolute',           desc:'Coordinates are absolute from work origin',                       params:'',             ex:'G90'},
+  {code:'G91',group:'Position',  name:'Incremental',        desc:'Coordinates are relative to current position',                    params:'',             ex:'G91'},
+  {code:'G92',group:'Position',  name:'Set Position',       desc:'Define current position as the given coordinates',                 params:'X Y Z',        ex:'G92 X0 Y0'},
+  // Compensation
+  {code:'G40',group:'Comp',      name:'Kerf Cancel',        desc:'Cancel cutter/kerf compensation',                                  params:'',             ex:'G40'},
+  {code:'G41',group:'Comp',      name:'Kerf Left',          desc:'Kerf compensation — offset cut path to the left of motion',       params:'D',            ex:'G41 D0.5'},
+  {code:'G42',group:'Comp',      name:'Kerf Right',         desc:'Kerf compensation — offset cut path to the right of motion',      params:'D',            ex:'G42 D0.5'},
+  // Feed
+  {code:'G93',group:'Feed',      name:'Inverse Time',       desc:'Feed rate in inverse time mode (1/minutes)',                       params:'F',            ex:'G93 F2'},
+  {code:'G94',group:'Feed',      name:'Feed/Min',           desc:'Feed rate in units per minute (standard)',                         params:'F',            ex:'G94'},
+  // Plasma-specific M codes
+  {code:'M00',group:'Program',   name:'Stop',               desc:'Unconditional program stop. Operator must resume.',                params:'',             ex:'M00'},
+  {code:'M01',group:'Program',   name:'Optional Stop',      desc:'Stop if optional stop switch is enabled',                          params:'',             ex:'M01'},
+  {code:'M02',group:'Program',   name:'End Program',        desc:'End of program',                                                   params:'',             ex:'M02'},
+  {code:'M03',group:'Torch',     name:'Torch ON',           desc:'Start torch / spindle CW. On plasma: ignite and begin cutting',   params:'S',            ex:'M03'},
+  {code:'M05',group:'Torch',     name:'Torch OFF',          desc:'Stop torch / spindle',                                             params:'',             ex:'M05'},
+  {code:'M06',group:'Tool',      name:'Tool Change',        desc:'Change to tool specified by T code',                               params:'T',            ex:'T1 M06'},
+  {code:'M07',group:'Torch',     name:'Mist ON',            desc:'On plasma: torch on (alternative to M03 on some controllers)',    params:'',             ex:'M07'},
+  {code:'M08',group:'Torch',     name:'Coolant ON',         desc:'Coolant / assist gas on. Plasma: torch fire',                     params:'',             ex:'M08'},
+  {code:'M09',group:'Torch',     name:'Coolant OFF',        desc:'Coolant / assist gas off. Plasma: torch off',                     params:'',             ex:'M09'},
+  {code:'M30',group:'Program',   name:'End + Rewind',       desc:'End of program and rewind to start',                              params:'',             ex:'M30'},
+  {code:'M64',group:'Torch',     name:'Torch ON (LinuxCNC)',desc:'Digital output on — torch fire (LinuxCNC/Mach plasma)',            params:'',             ex:'M64 P0'},
+  {code:'M65',group:'Torch',     name:'Torch OFF (LinuxCNC)',desc:'Digital output off — torch stop (LinuxCNC/Mach plasma)',         params:'',             ex:'M65 P0'},
+  // Comments / misc
+  {code:'F',  group:'Param',     name:'Feed Rate',          desc:'Feed rate in mm/min (G94) or in/min (G20). Plasma: 800–4000',    params:'value',        ex:'F1500'},
+  {code:'S',  group:'Param',     name:'Speed / Amps',       desc:'Spindle speed or cutting amperage (controller-dependent)',        params:'value',        ex:'S45'},
+  {code:'T',  group:'Param',     name:'Tool',               desc:'Tool number for next M06 change',                                  params:'number',       ex:'T1'},
+  {code:'N',  group:'Param',     name:'Line Number',        desc:'Block / line number (optional, for reference)',                    params:'number',       ex:'N100'},
+];
+
+// ── NC → Geometry parser (KODE side) ──────────────────────────
+function parseNCtoGeom(text) {
+  const lines = text.replace(/\r/g,'').split('\n');
+  let x=0, y=0, torchOn=false, inchMode=true;
+  const paths = [];   // [{pts:[], isCut:bool}]
+  const rapids = [];  // rapid move segments
+  let cur = null;
+
+  function toMM(v){ return inchMode ? v*25.4 : v; }
+  function coord(s,t){ const m=s.match(new RegExp(t+'([+-]?[0-9]*\\.?[0-9]+)','i')); return m?parseFloat(m[1]):null; }
+
+  function commit(){
+    if(!cur||cur.pts.length<2) { cur=null; return; }
+    const f=cur.pts[0], l=cur.pts[cur.pts.length-1];
+    if(Math.hypot(f.x-l.x,f.y-l.y)<0.5&&cur.pts.length>2) cur.pts.pop();
+    paths.push({pts:[...cur.pts], isCut:true});
+    cur=null;
+  }
+
+  for(const raw of lines){
+    const line=raw.trim().replace(/;.*$/,'').replace(/\([^)]*\)/g,'').toUpperCase();
+    if(!line) continue;
+    if(line.includes('G20')) inchMode=true;
+    if(line.includes('G21')) inchMode=false;
+    const torchOn_codes=['M08','M03','M07','M64'], torchOff_codes=['M09','M05','M65'];
+    if(torchOn_codes.some(c=>line.includes(c)))  { if(!torchOn){ torchOn=true; cur=null; } }
+    if(torchOff_codes.some(c=>line.includes(c))) { if(torchOn){ torchOn=false; commit(); } }
+    const nx2=coord(line,'X'), ny2=coord(line,'Y');
+    if(nx2===null&&ny2===null) continue;
+    const nx=nx2!==null?toMM(nx2):x, ny=ny2!==null?toMM(ny2):y;
+    if(!torchOn){
+      rapids.push({x1:x,y1:y,x2:nx,y2:ny});
+    } else if(line.match(/^G0*1/)||line.match(/^[XY]/)){
+      if(!cur) cur={pts:[{x,y}]};
+      cur.pts.push({x:nx,y:ny});
+    } else if(line.match(/^G0*[23]/)){
+      const iM=line.match(/I([+-]?[0-9]*\.?[0-9]+)/i),jM=line.match(/J([+-]?[0-9]*\.?[0-9]+)/i);
+      const ci=iM?toMM(parseFloat(iM[1])):0, cj=jM?toMM(parseFloat(jM[1])):0;
+      const cx2=x+ci, cy2=y+cj, r=Math.hypot(ci,cj);
+      const sa=Math.atan2(y-cy2,x-cx2), ea=Math.atan2(ny-cy2,nx-cx2);
+      const ccw=line.match(/^G0*3/);
+      let span=ccw?(ea-sa+2*Math.PI)%(2*Math.PI):(sa-ea+2*Math.PI)%(2*Math.PI);
+      if(span===0) span=2*Math.PI;
+      const segs=Math.max(4,Math.round(36*span/(2*Math.PI)));
+      if(!cur) cur={pts:[{x,y}]};
+      for(let i=1;i<=segs;i++){
+        const t=i/segs, a=ccw?sa+t*span:sa-t*span;
+        cur.pts.push({x:cx2+r*Math.cos(a), y:cy2+r*Math.sin(a)});
+      }
+    }
+    x=nx; y=ny;
+  }
+  if(cur) commit();
+  return {paths, rapids};
+}
+
+// ── Draw toolpath on KONSOLE canvas ───────────────────────────
+let _tpAnimId=null;
+function drawToolpath(text){
+  const cv=document.getElementById('toolpath-canvas');
+  if(!cv) return;
+  const ctx=cv.getContext('2d');
+  const W=cv.clientWidth, H=cv.clientHeight;
+  cv.width=W; cv.height=H;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#05060a'; ctx.fillRect(0,0,W,H);
+
+  if(!text||!text.trim()){
+    ctx.fillStyle='rgba(200,160,80,0.3)'; ctx.font='10px Fira Code,monospace';
+    ctx.textAlign='center'; ctx.fillText('No G-code',W/2,H/2); return;
+  }
+
+  const geom=parseNCtoGeom(text);
+  if(!geom.paths.length&&!geom.rapids.length){
+    ctx.fillStyle='rgba(200,160,80,0.3)'; ctx.font='10px Fira Code,monospace';
+    ctx.textAlign='center'; ctx.fillText('No toolpath found',W/2,H/2); return;
+  }
+
+  // Bounds
+  let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+  for(const p of geom.paths) for(const pt of p.pts){minX=Math.min(minX,pt.x);maxX=Math.max(maxX,pt.x);minY=Math.min(minY,pt.y);maxY=Math.max(maxY,pt.y);}
+  for(const r of geom.rapids){minX=Math.min(minX,r.x1,r.x2);maxX=Math.max(maxX,r.x1,r.x2);minY=Math.min(minY,r.y1,r.y2);maxY=Math.max(maxY,r.y1,r.y2);}
+  if(!isFinite(minX)){minX=0;maxX=100;minY=0;maxY=100;}
+  const pad=24, rx=maxX-minX||1, ry=maxY-minY||1;
+  const sc=Math.min((W-pad*2)/rx,(H-pad*2)/ry);
+  const ox=(W-rx*sc)/2-minX*sc, oy=(H+ry*sc)/2+minY*sc;
+  function s(px,py){return{x:px*sc+ox, y:-py*sc+oy};}
+
+  // Draw rapids
+  ctx.strokeStyle='rgba(100,120,160,0.35)'; ctx.lineWidth=0.8; ctx.setLineDash([3,3]);
+  for(const r of geom.rapids){
+    const a=s(r.x1,r.y1),b=s(r.x2,r.y2);
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // Draw cut paths
+  ctx.lineWidth=1.2;
+  const colors=['#cc1133','#ff4455','#e03358','#ff6677'];
+  geom.paths.forEach((p,pi)=>{
+    ctx.strokeStyle=colors[pi%colors.length];
+    ctx.beginPath();
+    p.pts.forEach((pt,i)=>{const sv=s(pt.x,pt.y); i===0?ctx.moveTo(sv.x,sv.y):ctx.lineTo(sv.x,sv.y);});
+    if(p.isCut&&p.pts.length>2){const f=s(p.pts[0].x,p.pts[0].y);ctx.lineTo(f.x,f.y);}
+    ctx.stroke();
+  });
+
+  // Info overlay
+  let totalLen=0;
+  for(const p of geom.paths) for(let i=1;i<p.pts.length;i++) totalLen+=Math.hypot(p.pts[i].x-p.pts[i-1].x,p.pts[i].y-p.pts[i-1].y);
+  const info=document.getElementById('tp-info');
+  if(info) info.innerHTML=`${geom.paths.length} cut${geom.paths.length!==1?'s':''} &nbsp;|&nbsp; ${totalLen.toFixed(0)} mm total &nbsp;|&nbsp; ${rx.toFixed(0)}×${ry.toFixed(0)} mm`;
+}
+
+// Debounced update
+let _tpTimer=null;
+function scheduleTpUpdate(){
+  clearTimeout(_tpTimer);
+  _tpTimer=setTimeout(()=>{
+    if(document.getElementById('ot-toolpath')&&document.getElementById('ot-toolpath').classList.contains('active')){
+      drawToolpath(document.getElementById('editor')&&document.getElementById('editor').value||'');
+    }
+  },300);
+}
+
+// ── G-code Library ─────────────────────────────────────────────
+function buildLibTable(filter){
+  const tbl=document.getElementById('lib-table'); if(!tbl)return;
+  const q=(filter||'').toLowerCase();
+  const filtered=GCODE_LIB.filter(r=>!q||r.code.toLowerCase().includes(q)||r.name.toLowerCase().includes(q)||r.desc.toLowerCase().includes(q));
+  const groups=[...new Set(filtered.map(r=>r.group))];
+  tbl.innerHTML=groups.map(g=>{
+    const rows=filtered.filter(r=>r.group===g).map(r=>`
+      <div class="lib-row" onclick="insertCode('${r.ex||r.code}')" title="${r.ex||''}">
+        <span class="lib-code">${r.code}</span>
+        <span class="lib-name">${r.name}</span>
+        <span class="lib-desc">${r.desc}</span>
+      </div>`).join('');
+    return `<div class="lib-group-head">${g}</div>${rows}`;
+  }).join('');
+}
+function filterLib(v){ buildLibTable(v); }
+function insertCode(ex){
+  const ed=document.getElementById('editor'); if(!ed)return;
+  const pos=ed.selectionStart, text=ed.value;
+  const before=text.slice(0,pos), after=text.slice(pos);
+  const ins=(before.endsWith('\n')||before===''?'':'\n')+ex+'\n';
+  ed.value=before+ins+after;
+  ed.selectionStart=ed.selectionEnd=pos+ins.length;
+  ed.focus();
+  if(typeof updateGutter==='function') updateGutter();
+}
+
+// ── Tab switching for new tabs ─────────────────────────────────
+const _origSwitchOutTab = typeof switchOutTab==='function' ? switchOutTab : null;
+function switchOutTab(id){
+  document.querySelectorAll('.out-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('console-pane').classList.remove('visible');
+  const tp=document.getElementById('toolpath-pane'), lp=document.getElementById('lib-pane');
+  if(tp) tp.classList.remove('visible');
+  if(lp) lp.classList.remove('visible');
+  const btn=document.getElementById('ot-'+id);
+  if(btn) btn.classList.add('active');
+  if(id==='console'){
+    document.getElementById('console-pane').classList.add('visible');
+  } else if(id==='toolpath'){
+    if(tp){ tp.classList.add('visible');
+      const ed=document.getElementById('editor');
+      if(ed) drawToolpath(ed.value);
+    }
+  } else if(id==='lib'){
+    if(lp){ lp.classList.add('visible'); buildLibTable(''); }
+  } else {
+    // fallback — try existing pane with same id
+    const p=document.getElementById(id+'-pane');
+    if(p) p.classList.add('visible');
+  }
+}
+
+// Wire out-tab clicks
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.out-tab').forEach(t=>{
+    t.addEventListener('click',()=>switchOutTab(t.id.replace('ot-','')));
+  });
+  buildLibTable('');
+  // show console pane on start
+  const cp=document.getElementById('console-pane');
+  if(cp) cp.classList.add('visible');
+});
+
+// ── Resize handle ──────────────────────────────────────────────
+(function(){
+  let dragging=false, startY=0, startH=0;
+  document.addEventListener('DOMContentLoaded',()=>{
+    const rh=document.getElementById('resize-handle');
+    const op=document.getElementById('output-panel');
+    if(!rh||!op) return;
+    rh.addEventListener('mousedown',e=>{
+      dragging=true; startY=e.clientY;
+      startH=op.getBoundingClientRect().height;
+      rh.classList.add('dragging');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove',e=>{
+      if(!dragging) return;
+      const delta=startY-e.clientY;
+      const newH=Math.max(54,Math.min(window.innerHeight*0.7, startH+delta));
+      op.style.height=newH+'px';
+    });
+    document.addEventListener('mouseup',()=>{ dragging=false; document.getElementById('resize-handle').classList.remove('dragging'); });
+  });
+})();
+
+// ── Send to KAM ────────────────────────────────────────────────
+function sendToKAM(){
+  const ed=document.getElementById('editor'); if(!ed) return;
+  const nc=ed.value;
+  if(!nc.trim()){ showToast('No G-code to send'); return; }
+  const payload={source:'kode',nc,timestamp:new Date().toISOString()};
+  try{
+    localStorage.setItem('kode_to_kam',JSON.stringify(payload));
+    showToast('Sent to KAM — switch to KAM and use File → Receive from KODE');
+  } catch(e){
+    // localStorage blocked — download as file
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([nc],{type:'text/plain'}));
+    a.download='kode_export.nc'; a.click();
+    showToast('localStorage blocked — downloaded as .nc');
+  }
+}
+
 /* ════════════════════════════════════════════════════
    .KODE v3  ·  KOFFEE (JS) + KREAM (HTML) + G-KODE (CNC)
 ════════════════════════════════════════════════════ */
@@ -1040,7 +1387,8 @@ edEl.addEventListener('keydown',e=>{
   }
 });
 
-edEl.addEventListener('input',()=>{
+edEl.addEventListener('input', function(){ scheduleTpUpdate(); }, false);
+  edEl.addEventListener('input',()=>{
   syncGutter();updateCursor();triggerAC();updateMinimap();lint();applyHL();
   const cur=tabs.find(t=>t.id===activeTabId);
   if(cur){cur.content=edEl.value;cur.modified=true;renderTabs();}
