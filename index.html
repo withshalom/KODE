@@ -1175,10 +1175,10 @@ function formatCode(){
   let ind=0,out=[];
   for(const l of lines){
     const t=l.trim();if(!t){out.push('');continue;}
-    const cl=(t.match(/^[}\])]/)??[]).length;
+    const cl=(t.match(/^[}\])]/) || []).length;
     ind=Math.max(0,ind-cl);
     out.push('  '.repeat(ind)+t);
-    ind=Math.max(0,ind+(t.match(/[{[(]/g)??[]).length-(t.match(/[}\])]/g)??[]).length+cl);
+    ind=Math.max(0,ind+(t.match(/[{[(]/g) || []).length-(t.match(/[}\])]/g) || []).length+cl);
   }
   edEl.value=out.join('\n');
   syncGutter();updateMinimap();applyHL();showToast('Formatted · KOFFEE');
@@ -1379,11 +1379,11 @@ function parseGcode(txt){
     const hasG=c=>new RegExp(`\\bG0*${c}\\b`).test(l);
     if(/\bM0*[78]\b/.test(l))torchOn=true;
     if(/\bM0*9\b/.test(l))torchOn=false;
-    const nx=gv('X')??x,ny=gv('Y')??y,nz=gv('Z')??z,nf=gv('F')??f;
+    const nx=(gv('X') != null ? gv('X') : x),ny=(gv('Y') != null ? gv('Y') : y),nz=(gv('Z') != null ? gv('Z') : z),nf=(gv('F') != null ? gv('F') : f);
     if(gv('X')!==null||gv('Y')!==null||gv('Z')!==null){
       const rapid=hasG(0);
       if(hasG(2)||hasG(3)){
-        const ii=gv('I')??0,jj=gv('J')??0;
+        const ii=(gv('I') != null ? gv('I') : 0),jj=(gv('J') != null ? gv('J') : 0);
         const cx=x+ii,cy=y+jj;
         const r=Math.hypot(ii,jj);
         const a0=Math.atan2(y-cy,x-cx);
