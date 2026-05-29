@@ -1,4 +1,24 @@
 <!DOCTYPE html>
+<!--
+  KERFsuite™ — Kernel-Aided Design Suite
+  Copyright (C) 2024-2025 KERFsuite / withshalom
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published
+  by the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  Commercial use requires a separate license — see KERFsuite: https://withshalom.github.io
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -381,9 +401,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
   </div>
   <div class="tb-div"></div>
   <div class="mode-toggle">
-    <button class="mode-btn gkode active"  id="btn-gkode">⚙ GK</button>
-    <button class="mode-btn koffee"        id="btn-koffee">☕ KF</button>
-    <button class="mode-btn kream"         id="btn-kream">✦ KR</button>
+    <button class="mode-btn gkode active"  id="btn-gkode" onclick="setMode('gkode')">⚙ GK</button>
+    <button class="mode-btn koffee"        id="btn-koffee" onclick="setMode('koffee')">☕ KF</button>
+    <button class="mode-btn kream"         id="btn-kream"  onclick="setMode('kream')">✦ KR</button>
   </div>
   <div class="tb-div"></div>
   <button class="tbb" id="btn-snip" title="Snippets (Ctrl+J)">
@@ -921,6 +941,7 @@ console.log(a.add(b).toString(), "| mag:", a.mag());
 `;
 
 const KREAM_CODE=`<!DOCTYPE html>
+<!--\n  KERFsuite™ — Kernel-Aided Design Suite\n  Copyright (C) 2024-2025 KERFsuite / withshalom\n\n  This program is free software: you can redistribute it and/or modify\n  it under the terms of the GNU Affero General Public License as published\n  by the Free Software Foundation, either version 3 of the License, or\n  (at your option) any later version.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n  GNU Affero General Public License for more details.\n\n  You should have received a copy of the GNU Affero General Public License\n  along with this program. If not, see <https://www.gnu.org/licenses/>.\n\n  SPDX-License-Identifier: AGPL-3.0-or-later\n  Commercial use requires a separate license — see KERFsuite: https://withshalom.github.io\n-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1177,7 +1198,7 @@ const JS_SNIPS=[
 ];
 
 const HTML_SNIPS=[
-  {name:'Boilerplate',  desc:'Full HTML5 document',  code:'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>$1</title>\n<style>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  body { font-family: system-ui, sans-serif; }\n</style>\n</head>\n<body>\n  $2\n</body>\n</html>'},
+  {name:'Boilerplate',  desc:'Full HTML5 document',  code:'<!DOCTYPE html>\n<!--\n  KERFsuite™ — Kernel-Aided Design Suite\n  Copyright (C) 2024-2025 KERFsuite / withshalom\n\n  This program is free software: you can redistribute it and/or modify\n  it under the terms of the GNU Affero General Public License as published\n  by the Free Software Foundation, either version 3 of the License, or\n  (at your option) any later version.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n  GNU Affero General Public License for more details.\n\n  You should have received a copy of the GNU Affero General Public License\n  along with this program. If not, see <https://www.gnu.org/licenses/>.\n\n  SPDX-License-Identifier: AGPL-3.0-or-later\n  Commercial use requires a separate license — see KERFsuite: https://withshalom.github.io\n-->\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>$1</title>\n<style>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  body { font-family: system-ui, sans-serif; }\n</style>\n</head>\n<body>\n  $2\n</body>\n</html>'},
   {name:'Flexbox center',desc:'Centered flex layout', code:'display: flex;\nalign-items: center;\njustify-content: center;'},
   {name:'CSS grid',     desc:'2-column grid',         code:'display: grid;\ngrid-template-columns: 1fr 1fr;\ngap: 16px;'},
   {name:'CSS var',      desc:'Custom property',       code:'--$1: $2;'},
@@ -1413,7 +1434,7 @@ const AC_JS=[
   {l:'if',k:'kw',d:'conditional'},{l:'try',k:'kw',d:'error handling'},
 ];
 const AC_HTML=[
-  {l:'<!DOCTYPE html>',k:'dtd',d:'HTML5 doctype'},{l:'<html',k:'tag',d:'root element'},
+  {l:'<!DOCTYPE html>\n<!--\n  KERFsuite™ — Kernel-Aided Design Suite\n  Copyright (C) 2024-2025 KERFsuite / withshalom\n\n  This program is free software: you can redistribute it and/or modify\n  it under the terms of the GNU Affero General Public License as published\n  by the Free Software Foundation, either version 3 of the License, or\n  (at your option) any later version.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n  GNU Affero General Public License for more details.\n\n  You should have received a copy of the GNU Affero General Public License\n  along with this program. If not, see <https://www.gnu.org/licenses/>.\n\n  SPDX-License-Identifier: AGPL-3.0-or-later\n  Commercial use requires a separate license — see KERFsuite: https://withshalom.github.io\n-->',k:'dtd',d:'HTML5 doctype'},{l:'<html',k:'tag',d:'root element'},
   {l:'<head>',k:'tag',d:'document head'},{l:'<body>',k:'tag',d:'document body'},
   {l:'<div',k:'tag',d:'block container'},{l:'<span',k:'tag',d:'inline container'},
   {l:'<p>',k:'tag',d:'paragraph'},{l:'<h1>',k:'tag',d:'heading 1'},
@@ -1593,7 +1614,7 @@ function lintIssues(){
       if(/<\/script>/i.test(l))unclosed.splice(unclosed.findIndex(u=>u.tag==='script'),1);
     });
     if(!edEl.value.includes('<!DOCTYPE'))
-      iss.push({ln:0,t:'w',msg:'Missing <!DOCTYPE html> declaration'});
+      iss.push({ln:0,t:'w',msg:'Missing <!DOCTYPE html>\n<!--\n  KERFsuite™ — Kernel-Aided Design Suite\n  Copyright (C) 2024-2025 KERFsuite / withshalom\n\n  This program is free software: you can redistribute it and/or modify\n  it under the terms of the GNU Affero General Public License as published\n  by the Free Software Foundation, either version 3 of the License, or\n  (at your option) any later version.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n  GNU Affero General Public License for more details.\n\n  You should have received a copy of the GNU Affero General Public License\n  along with this program. If not, see <https://www.gnu.org/licenses/>.\n\n  SPDX-License-Identifier: AGPL-3.0-or-later\n  Commercial use requires a separate license — see KERFsuite: https://withshalom.github.io\n--> declaration'});
     if(!/<html/i.test(edEl.value))
       iss.push({ln:0,t:'w',msg:'Missing <html> root element'});
   } else {
