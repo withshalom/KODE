@@ -677,11 +677,21 @@ function parseNCtoGeom(text) {
     cur=null;
   }
 
+  let lastGMotion='G0';
   for(const raw of lines){
-    const line=raw.trim().replace(/;.*$/,'').replace(/\([^)]*\)/g,'').toUpperCase();
+    const line=raw.trim()
+      .replace(/^N[0-9]+\s*/i,'')   // strip N-word line numbers
+      .replace(/;.*$/,'')
+      .replace(/\([^)]*\)/g,'')
+      .toUpperCase();
     if(!line) continue;
     if(line.includes('G20')) inchMode=true;
     if(line.includes('G21')) inchMode=false;
+    // Modal G tracking
+    if(line.match(/G0*0\b/)) lastGMotion='G0';
+    if(line.match(/G0*1\b/)) lastGMotion='G1';
+    if(line.match(/G0*2\b/)) lastGMotion='G2';
+    if(line.match(/G0*3\b/)) lastGMotion='G3';
     const torchOn_codes=['M08','M03','M07','M64'], torchOff_codes=['M09','M05','M65'];
     if(torchOn_codes.some(c=>line.includes(c)))  { if(!torchOn){ torchOn=true; cur=null; } }
     if(torchOff_codes.some(c=>line.includes(c))) { if(torchOn){ torchOn=false; commit(); } }
@@ -690,10 +700,15 @@ function parseNCtoGeom(text) {
     const nx=nx2!==null?toMM(nx2):x, ny=ny2!==null?toMM(ny2):y;
     if(!torchOn){
       rapids.push({x1:x,y1:y,x2:nx,y2:ny});
-    } else if(line.match(/^G0*1/)||line.match(/^[XY]/)){
-      if(!cur) cur={pts:[{x,y}]};
-      cur.pts.push({x:nx,y:ny});
-    } else if(line.match(/^G0*[23]/)){
+    } else {
+      const gM=line.match(/G0*([0-3])\b/);
+      const effG=gM?'G'+gM[1]:lastGMotion;
+      if(effG==='G1'){
+        if(!cur) cur={pts:[{x,y}]};
+        cur.pts.push({x:nx,y:ny});
+      } else if(effG==='G0') {
+        rapids.push({x1:x,y1:y,x2:nx,y2:ny}); // rapid
+      } else if(effG==='G2'||effG==='G3'){
       const iM=line.match(/I([+-]?[0-9]*\.?[0-9]+)/i),jM=line.match(/J([+-]?[0-9]*\.?[0-9]+)/i);
       const ci=iM?toMM(parseFloat(iM[1])):0, cj=jM?toMM(parseFloat(jM[1])):0;
       const cx2=x+ci, cy2=y+cj, r=Math.hypot(ci,cj);
@@ -706,6 +721,7 @@ function parseNCtoGeom(text) {
       for(let i=1;i<=segs;i++){
         const t=i/segs, a=ccw?sa+t*span:sa-t*span;
         cur.pts.push({x:cx2+r*Math.cos(a), y:cy2+r*Math.sin(a)});
+      }
       }
     }
     x=nx; y=ny;
