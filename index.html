@@ -49,9 +49,17 @@
   --kr-a:#f2e8d0;--kr-b:#fff8ef;--kr-c:#c8b48c;
   --kr-g:rgba(242,232,208,0.18);
   /* G·KODE: amber + green */
-  --gk-a:#cc1133;--gk-b:#ffe8ef;--gk-c:#e03358;
+  --gk-a:#e03800;--gk-b:#fff0e8;--gk-c:#c83000;
+  /* KAPPUCCINO: deep black + bold amber */
+  --kp-a:#ffb300;--kp-b:#fff8e1;--kp-c:#c67c00;--kp-d:#1a0f00;
+  /* KWIK: electric teal + ice white */
+  --kw-a:#00e5cc;--kw-b:#e8fffe;--kw-c:#00a896;--kw-d:#001a18;
+  /* KAR: hot rod red + white */
+  --kar-a:#ff1f1f;--kar-b:#ffffff;--kar-c:#cc0000;--kar-d:#1a0000;
+  /* KREMLIN: neon green + deep black */
+  --kl-a:#39ff14;--kl-b:#e8ffe0;--kl-c:#1db800;--kl-d:#011a00;
   /* semantic */
-  --green:#cc1133;--amber:#ffaa00;--red:#ff4455;--blue:#2b86c5;
+  --green:#e03800;--amber:#ffaa00;--red:#ff4455;--blue:#2b86c5;
   /* text */
   --t1:#dde8f5;--t2:#7080a0;--t3:#384860;--t4:#1a2535;
   /* fonts */
@@ -61,7 +69,11 @@
 }
 body.mode-koffee{--acc:var(--kf-a);--acc-b:var(--kf-b);--acc-c:var(--kf-c);}
 body.mode-kream {--acc:var(--kr-a);--acc-b:var(--kr-b);--acc-c:var(--kr-c);}
-body.mode-gkode {--acc:var(--gk-a);--acc-b:var(--gk-b);--acc-c:var(--gk-c);}
+body.mode-gkode    {--acc:var(--gk-a);--acc-b:var(--gk-b);--acc-c:var(--gk-c);}
+body.mode-kappuccino{--acc:var(--kp-a);--acc-b:var(--kp-b);--acc-c:var(--kp-c);}
+body.mode-kwik     {--acc:var(--kw-a);--acc-b:var(--kw-b);--acc-c:var(--kw-c);}
+body.mode-kar      {--acc:var(--kar-a);--acc-b:var(--kar-b);--acc-c:var(--kar-c);}
+body.mode-kremlin  {--acc:var(--kl-a);--acc-b:var(--kl-b);--acc-c:var(--kl-c);}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:var(--t1);font-family:var(--fd);font-size:13px;-webkit-font-smoothing:antialiased;}
@@ -73,12 +85,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .brand-mark{width:30px;height:30px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-weight:600;font-size:8px;color:#000;letter-spacing:0.04em;transition:all 0.4s;}
 .mode-koffee .brand-mark{background:linear-gradient(135deg,#2c1208 0%,#6b3d1a 40%,#d4aa78 100%);box-shadow:0 0 20px rgba(180,100,30,0.7);color:#f5e6c8;}
 .mode-kream  .brand-mark{background:linear-gradient(135deg,#f5e6c8 0%,#d4aa78 50%,#3a1e08 100%);box-shadow:0 0 20px rgba(212,170,120,0.5);color:#f5e6c8;}
-.mode-gkode  .brand-mark{background:linear-gradient(135deg,var(--gk-a),var(--gk-b));box-shadow:0 0 18px rgba(204,17,51,0.4);}
+.mode-gkode    .brand-mark{background:linear-gradient(135deg,var(--gk-a),var(--gk-b));box-shadow:0 0 18px rgba(224,56,0,0.4);}
+.mode-kappuccino .brand-mark{background:linear-gradient(135deg,#1a0f00 0%,#7a4500 40%,#ffb300 100%);box-shadow:0 0 20px rgba(255,179,0,0.6);color:#fff8e1;}
+.mode-kwik      .brand-mark{background:linear-gradient(135deg,#001a18 0%,#00574f 40%,#00e5cc 100%);box-shadow:0 0 20px rgba(0,229,204,0.5);color:#e8fffe;}
+.mode-kar       .brand-mark{background:linear-gradient(135deg,#1a0000 0%,#880000 40%,#ff1f1f 100%);box-shadow:0 0 22px rgba(255,31,31,0.7);color:#ffffff;}
+.mode-kremlin   .brand-mark{background:linear-gradient(135deg,#011a00 0%,#0a5200 40%,#39ff14 100%);box-shadow:0 0 22px rgba(57,255,20,0.7);color:#e8ffe0;}
 .brand-col{line-height:1.1;}
 .brand-name{font-family:var(--fd);font-weight:800;font-size:14px;letter-spacing:-0.02em;transition:all 0.4s;}
 .mode-koffee .brand-name{background:linear-gradient(90deg,#1a0e04,#6b3d1a,#d4aa78,#f5e6c8);background-size:300% auto;animation:kfPan 5s ease-in-out infinite alternate;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .mode-kream  .brand-name{background:linear-gradient(90deg,#f5e6c8,#d4aa78,#6b3d1a,#1a0e04);background-size:300% auto;animation:kfPan 5s ease-in-out infinite alternate;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .mode-gkode  .brand-name{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-kappuccino .brand-name{background:linear-gradient(90deg,#c67c00,#ffb300,#fff8e1,#ffb300);background-size:300% auto;animation:kfPan 5s ease-in-out infinite alternate;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-kwik      .brand-name{background:linear-gradient(90deg,#00a896,#00e5cc,#e8fffe,#00e5cc);background-size:300% auto;animation:kfPan 5s ease-in-out infinite alternate;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-kar       .brand-name{background:linear-gradient(90deg,#cc0000,#ff1f1f,#ffffff,#ff1f1f);background-size:300% auto;animation:kfPan 4s ease-in-out infinite alternate;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-kremlin   .brand-name{background:linear-gradient(90deg,#1db800,#39ff14,#e8ffe0,#39ff14);background-size:300% auto;animation:kfPan 4s ease-in-out infinite alternate;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .brand-sub{font-family:var(--fm);font-size:7px;color:var(--t3);letter-spacing:0.16em;text-transform:uppercase;margin-top:2px;}
 .tb-div{width:1px;height:18px;background:var(--border);margin:0 5px;flex-shrink:0;}
 
@@ -87,7 +107,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .mode-btn{padding:4px 10px;font-family:var(--fm);font-size:9px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border-radius:5px;cursor:pointer;border:none;background:transparent;color:var(--t3);transition:all 0.2s;white-space:nowrap;}
 .mode-btn.active.koffee{background:linear-gradient(90deg,#d4aa78,#f2e8d0);color:#1a100a;font-weight:600;box-shadow:0 0 14px rgba(212,170,120,0.4),inset 0 0 0 1px rgba(212,170,120,0.5);}
 .mode-btn.active.kream {background:linear-gradient(90deg,#c8b48c,#f2e8d0,#fff8ef);color:#2a1a08;font-weight:600;box-shadow:0 0 16px rgba(242,232,208,0.5),inset 0 0 0 1px rgba(242,232,208,0.6);}
-.mode-btn.active.gkode {background:linear-gradient(90deg,rgba(204,17,51,0.18),rgba(255,232,239,0.18));color:var(--gk-a);}
+.mode-btn.active.gkode {background:linear-gradient(90deg,rgba(224,56,0,0.18),rgba(255,232,239,0.18));color:var(--gk-a);}
+.mode-btn.active.kappuccino{background:linear-gradient(90deg,#1a0f00,#7a4500,#ffb300);color:#fff8e1;font-weight:600;box-shadow:0 0 16px rgba(255,179,0,0.35),inset 0 0 0 1px rgba(255,179,0,0.4);}
+.mode-btn.active.kwik  {background:linear-gradient(90deg,#001a18,#00574f,#00e5cc);color:#e8fffe;font-weight:600;box-shadow:0 0 16px rgba(0,229,204,0.35),inset 0 0 0 1px rgba(0,229,204,0.4);}
+.mode-btn.active.kremlin{background:linear-gradient(90deg,#011a00,#0a5200,#39ff14);color:#e8ffe0;font-weight:600;box-shadow:0 0 16px rgba(57,255,20,0.35),inset 0 0 0 1px rgba(57,255,20,0.4);}
 
 .tbb{height:28px;padding:0 8px;display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:10px;color:var(--t2);background:none;border:none;border-radius:5px;cursor:pointer;transition:all 0.12s;letter-spacing:0.03em;white-space:nowrap;}
 .tbb:hover{color:var(--t1);background:var(--hover);}
@@ -96,7 +119,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .btn-run{height:28px;padding:0 13px;display:flex;align-items:center;gap:6px;font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:0.06em;border:none;border-radius:5px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
 .mode-koffee .btn-run{background:linear-gradient(90deg,var(--kf-a),var(--blue));color:#000;box-shadow:0 0 14px rgba(212,170,120,0.3);}
 .mode-kream  .btn-run{background:linear-gradient(90deg,var(--kr-b),var(--kr-c),#3a1e08);color:#f5e6c8;box-shadow:0 0 14px rgba(212,170,120,0.3);}
-.mode-gkode  .btn-run{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));color:#000;box-shadow:0 0 14px rgba(204,17,51,0.3);}
+.mode-gkode    .btn-run{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));color:#000;box-shadow:0 0 14px rgba(224,56,0,0.3);}
+.mode-kappuccino .btn-run{background:linear-gradient(90deg,var(--kp-d),var(--kp-a));color:#000;box-shadow:0 0 16px rgba(255,179,0,0.4);}
+.mode-kwik      .btn-run{background:linear-gradient(90deg,var(--kw-d),var(--kw-a));color:#001a18;box-shadow:0 0 16px rgba(0,229,204,0.4);}
+.mode-kar       .btn-run{background:linear-gradient(90deg,var(--kar-d),var(--kar-a),var(--kar-b));color:#1a0000;box-shadow:0 0 18px rgba(255,31,31,0.5);font-weight:700;}
+.mode-kremlin   .btn-run{background:linear-gradient(90deg,var(--kl-d),var(--kl-a));color:#011a00;box-shadow:0 0 18px rgba(57,255,20,0.5);font-weight:700;}
 .btn-run:hover{filter:brightness(1.15);}
 .btn-run svg{width:9px;height:9px;fill:#000;stroke:none;}
 .btn-sm{height:28px;padding:0 9px;font-family:var(--fm);font-size:10px;color:var(--t2);background:none;border:1px solid var(--border);border-radius:5px;cursor:pointer;transition:all 0.12s;letter-spacing:0.04em;white-space:nowrap;}
@@ -114,6 +141,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .mode-koffee .tab-dot,.tab[data-mode=koffee] .tab-dot{background:linear-gradient(135deg,var(--kf-a),var(--kf-c));box-shadow:0 0 5px var(--kf-a);}
 .mode-kream  .tab-dot,.tab[data-mode=kream]  .tab-dot{background:linear-gradient(135deg,var(--kr-a),var(--kr-c));box-shadow:0 0 6px rgba(242,232,208,0.7);}
 .mode-gkode  .tab-dot,.tab[data-mode=gkode]  .tab-dot{background:linear-gradient(135deg,var(--gk-a),var(--gk-b));box-shadow:0 0 5px var(--gk-a);}
+.mode-kappuccino .tab-dot,.tab[data-mode=kappuccino] .tab-dot{background:linear-gradient(135deg,var(--kp-a),var(--kp-c));box-shadow:0 0 5px var(--kp-a);}
+.mode-kwik      .tab-dot,.tab[data-mode=kwik]      .tab-dot{background:linear-gradient(135deg,var(--kw-a),var(--kw-c));box-shadow:0 0 6px rgba(0,229,204,0.8);}
+.mode-kar       .tab-dot,.tab[data-mode=kar]       .tab-dot{background:linear-gradient(135deg,var(--kar-a),var(--kar-b));box-shadow:0 0 6px rgba(255,31,31,0.9);}
+.mode-kremlin   .tab-dot,.tab[data-mode=kremlin]   .tab-dot{background:linear-gradient(135deg,var(--kl-a),var(--kl-c));box-shadow:0 0 6px rgba(57,255,20,0.9);}
 .tab-mod{width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;}
 .tab-x{width:14px;height:14px;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:10px;color:var(--t3);transition:all 0.1s;margin-left:2px;}
 .tab-x:hover{background:rgba(255,68,102,0.2);color:var(--red);}
@@ -158,7 +189,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 #editor{position:absolute;top:0;left:0;right:0;bottom:0;padding:14px 16px;font-family:var(--fm);font-size:12.5px;line-height:1.72;background:var(--bg);color:var(--t1);border:none;outline:none;resize:none;tab-size:2;white-space:pre;overflow-y:auto;overflow-x:auto;caret-color:var(--acc);letter-spacing:0.01em;scrollbar-width:thin;scrollbar-color:var(--border) transparent;z-index:2;}
 #editor::selection{background:rgba(212,170,120,0.22);}
 .mode-kream  #editor::selection{background:rgba(242,232,208,0.18);}
-.mode-gkode  #editor::selection{background:rgba(204,17,51,0.14);}
+.mode-gkode  #editor::selection{background:rgba(224,56,0,0.14);}
 
 /* ── RIGHT PANE (minimap / toolpath / html preview) ── */
 #right-pane{width:72px;background:var(--bg);border-left:1px solid var(--border);overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;}
@@ -245,6 +276,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .log-gcode .log-msg{color:var(--gk-b);}
 .log-kream .log-ic::before{content:'◈';color:var(--kr-a);}
 .log-kream .log-msg{color:var(--kr-a);}
+.log-kappuccino .log-ic::before{content:'◆';color:var(--kp-a);}
+.log-kappuccino .log-msg{color:var(--kp-b);}
+.log-kwik .log-ic::before{content:'⚡';color:var(--kw-a);}
+.log-kwik .log-msg{color:var(--kw-b);}
+.log-kar .log-ic::before{content:'▣';color:var(--kar-a);}
+.log-kar .log-msg{color:var(--kar-b);}
+.log-kremlin .log-ic::before{content:'❋';color:var(--kl-a);}
+.log-kremlin .log-msg{color:var(--kl-b);}
 .val-num{color:var(--kf-a);}
 .val-str{color:var(--green);}
 .val-bool{color:var(--amber);}
@@ -261,7 +300,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 #statusbar{height:24px;flex-shrink:0;display:flex;align-items:center;padding:0 12px;gap:14px;font-family:var(--fm);font-size:10px;font-weight:500;color:rgba(0,0,0,0.75);letter-spacing:0.04em;transition:background 0.4s;}
 .mode-koffee #statusbar{background:linear-gradient(90deg,#d4aa78,#f2e8d0,#b88848);opacity:0.95;}
 .mode-kream  #statusbar{background:linear-gradient(90deg,#c8b48c,#f2e8d0,#fff8ef,#e0d0b0);opacity:0.95;}
-.mode-gkode  #statusbar{background:linear-gradient(90deg,rgba(204,17,51,0.88),rgba(255,232,239,0.88));}
+.mode-gkode    #statusbar{background:linear-gradient(90deg,rgba(224,56,0,0.88),rgba(255,232,239,0.88));}
+.mode-kappuccino #statusbar{background:linear-gradient(90deg,#1a0f00,#7a4500,#ffb300,#fff8e1);opacity:0.97;}
+.mode-kwik      #statusbar{background:linear-gradient(90deg,#001a18,#00574f,#00e5cc,#e8fffe);opacity:0.97;}
+.mode-kar       #statusbar{background:linear-gradient(90deg,#1a0000,#880000,#ff1f1f,#ffffff);opacity:0.97;}
+.mode-kremlin   #statusbar{background:linear-gradient(90deg,#011a00,#0a5200,#39ff14,#e8ffe0);opacity:0.97;}
 #statusbar .sb-r{margin-left:auto;display:flex;gap:14px;}
 
 /* ── SYNTAX HIGHLIGHT ── */
@@ -284,15 +327,45 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .sh-g{color:#ffaa00;font-weight:600;}
 .sh-m{color:#ff7b72;font-weight:600;}
 .sh-coord{color:#00d4ff;}
-.sh-param{color:#cc1133;}
+.sh-param{color:#e03800;}
 .sh-gcmt{color:#5a7090;font-style:italic;}
+/* Java (KAPPUCCINO) */
+.sh-jkw{color:#ffb300;font-weight:600;}
+.sh-jtype{color:#ffd54f;}
+.sh-jfn{color:#fff8e1;}
+.sh-jstr{color:#a5d6ff;}
+.sh-jnum{color:#ffcc02;}
+.sh-jcmt{color:#5a4a2a;font-style:italic;}
+.sh-jann{color:#ff8c00;}
+/* Swift (KWIK) */
+.sh-skw{color:#00e5cc;font-weight:600;}
+.sh-stype{color:#80fff5;}
+.sh-sfn{color:#e8fffe;}
+.sh-sstr{color:#a5ffee;}
+.sh-snum{color:#00e5cc;}
+.sh-scmt{color:#1a4a44;font-style:italic;}
+.sh-sattr{color:#00b8a0;}
+/* KAR: generic / universal */
+.sh-karkw{color:#ff1f1f;font-weight:600;}
+.sh-karstr{color:#ffaaaa;}
+.sh-karnum{color:#ff6666;}
+.sh-karcmt{color:#4a1a1a;font-style:italic;}
+.sh-karfn{color:#ffffff;}
+/* Kotlin (KREMLIN) */
+.sh-klkw{color:#39ff14;font-weight:600;}
+.sh-kltype{color:#a0ff80;}
+.sh-klfn{color:#e8ffe0;}
+.sh-klstr{color:#80ffaa;}
+.sh-klnum{color:#39ff14;}
+.sh-klcmt{color:#1a4a1a;font-style:italic;}
+.sh-klann{color:#00cc44;}
 
 /* ── SIM CONTROLS ── */
 #sim-controls{display:none;align-items:center;gap:7px;padding:0 6px;}
 .mode-gkode #sim-controls{display:flex;}
 .sim-btn{height:22px;width:22px;display:flex;align-items:center;justify-content:center;background:var(--panel2);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--t2);font-size:10px;transition:all 0.12s;flex-shrink:0;}
 .sim-btn:hover{color:var(--gk-a);border-color:var(--gk-a);}
-.sim-btn.active{background:rgba(204,17,51,0.15);color:var(--gk-a);border-color:var(--gk-a);}
+.sim-btn.active{background:rgba(224,56,0,0.15);color:var(--gk-a);border-color:var(--gk-a);}
 #sim-speed{width:52px;height:4px;accent-color:var(--gk-a);cursor:pointer;}
 .sim-lbl{font-family:var(--fm);font-size:9px;color:var(--t3);}
 
@@ -302,7 +375,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .sc-modal{background:var(--panel);border:1px solid var(--border-hi);border-radius:12px;padding:24px;min-width:360px;max-width:460px;width:90%;}
 .sc-title{font-family:var(--fd);font-weight:800;font-size:16px;margin-bottom:16px;}
 .mode-koffee .sc-title,.mode-kream .sc-title{background:linear-gradient(90deg,var(--kf-a),var(--kf-c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.mode-gkode  .sc-title{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-gkode    .sc-title{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-kappuccino .sc-title{background:linear-gradient(90deg,var(--kp-a),var(--kp-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-kwik      .sc-title{background:linear-gradient(90deg,var(--kw-a),var(--kw-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-kar       .sc-title{background:linear-gradient(90deg,var(--kar-a),var(--kar-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mode-kremlin   .sc-title{background:linear-gradient(90deg,var(--kl-a),var(--kl-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;}
 .sc-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);}
 .sc-action{font-family:var(--fm);font-size:10px;color:var(--t2);}
@@ -326,8 +403,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
   transition:all 0.15s;letter-spacing:0.04em;width:100%;}
 .op-btn:hover{background:var(--hover);border-color:var(--border-hi);color:var(--t1);}
 .op-btn svg{width:12px;height:12px;flex-shrink:0;}
-.op-btn.nc  {color:#cc1133;border-color:rgba(204,17,51,0.25);}
-.op-btn.nc:hover {background:rgba(204,17,51,0.06);border-color:#cc1133;}
+.op-btn.nc  {color:#e03800;border-color:rgba(224,56,0,0.25);}
+.op-btn.nc:hover {background:rgba(224,56,0,0.06);border-color:#e03800;}
 .op-btn.js  {color:#d4aa78;border-color:rgba(212,170,120,0.25);}
 .op-btn.js:hover {background:rgba(212,170,120,0.06);border-color:#d4aa78;}
 .op-btn.htm {color:#f2e8d0;border-color:rgba(242,232,208,0.2);}
@@ -361,12 +438,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 }
 #tp-sendkam {
   position:absolute; top:8px; right:8px;
-  padding:4px 10px; background:rgba(204,17,51,0.15);
+  padding:4px 10px; background:rgba(224,56,0,0.15);
   border:1px solid var(--gk-a); border-radius:3px;
   font-family:var(--fm); font-size:9px; color:var(--gk-a);
   cursor:pointer; transition:all 0.15s; letter-spacing:0.06em;
 }
-#tp-sendkam:hover { background:rgba(204,17,51,0.28); }
+#tp-sendkam:hover { background:rgba(224,56,0,0.28); }
 
 /* ── G-code library pane ───────────────────────────────────── */
 #lib-pane {
@@ -414,9 +491,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
   </div>
   <div class="tb-div"></div>
   <div class="mode-toggle">
-    <button class="mode-btn gkode active"  id="btn-gkode" onclick="setMode('gkode')">⚙ GK</button>
-    <button class="mode-btn koffee"        id="btn-koffee" onclick="setMode('koffee')">☕ KF</button>
-    <button class="mode-btn kream"         id="btn-kream"  onclick="setMode('kream')">✦ KR</button>
+    <button class="mode-btn gkode active"   id="btn-gkode"     onclick="setMode('gkode')">⚙ GK</button>
+    <button class="mode-btn koffee"         id="btn-koffee"    onclick="setMode('koffee')">☕ KF</button>
+    <button class="mode-btn kream"          id="btn-kream"     onclick="setMode('kream')">✦ KR</button>
+    <button class="mode-btn kappuccino"      id="btn-kappuccino" onclick="setMode('kappuccino')">◆ KP</button>
+    <button class="mode-btn kwik"           id="btn-kwik"      onclick="setMode('kwik')">⚡ KW</button>
+    <button class="mode-btn kremlin"        id="btn-kremlin"   onclick="setMode('kremlin')">❋ KL</button>
   </div>
   <div class="tb-div"></div>
   <button class="tbb" id="btn-snip" title="Snippets (Ctrl+J)">
@@ -437,6 +517,40 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
   <button class="tbb" id="btn-keys" title="Shortcuts (?)">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
   </button>
+  <div id="kompile-controls" style="display:none;align-items:center;gap:6px;">
+    <select id="kompile-lang" style="height:26px;padding:0 8px;font-family:var(--fm);font-size:10px;background:var(--panel2);color:var(--acc);border:1px solid var(--border-hi);border-radius:5px;outline:none;cursor:pointer;letter-spacing:0.04em;">
+      <option value="java">Java</option>
+      <option value="swift">Swift</option>
+    </select>
+    <select id="kar-lang" style="display:none;height:26px;padding:0 8px;font-family:var(--fm);font-size:10px;background:var(--panel2);color:var(--kar-a);border:1px solid rgba(255,31,31,0.4);border-radius:5px;outline:none;cursor:pointer;letter-spacing:0.04em;min-width:120px;">
+      <option value="python">Python</option>
+      <option value="ruby">Ruby</option>
+      <option value="go">Go</option>
+      <option value="rust">Rust</option>
+      <option value="c">C</option>
+      <option value="cpp">C++</option>
+      <option value="csharp">C#</option>
+      <option value="php">PHP</option>
+      <option value="kotlin">Kotlin</option>
+      <option value="scala">Scala</option>
+      <option value="typescript">TypeScript</option>
+      <option value="lua">Lua</option>
+      <option value="perl">Perl</option>
+      <option value="r">R</option>
+      <option value="haskell">Haskell</option>
+      <option value="elixir">Elixir</option>
+      <option value="erlang">Erlang</option>
+      <option value="clojure">Clojure</option>
+      <option value="fsharp">F#</option>
+      <option value="bash">Bash</option>
+      <option value="powershell">PowerShell</option>
+      <option value="julia">Julia</option>
+      <option value="dart">Dart</option>
+      <option value="nasm">Assembly (NASM)</option>
+    </select>
+    <span id="kompile-status" style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.06em;"></span>
+  </div>
+  <div class="tb-div" id="kompile-div" style="display:none;"></div>
   <div id="sim-controls">
     <span class="sim-lbl">SIM</span>
     <button class="sim-btn" id="sim-play" title="Animate">▶</button>
@@ -479,7 +593,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
           </svg>
           Open file
         </button>
-        <input type="file" id="load-file" accept=".nc,.NC,.gcode,.js,.html,.htm,.kam,.txt,.TXT" onchange="loadFile(event)" style="display:none">
+        <input type="file" id="load-file" accept=".nc,.NC,.gcode,.js,.html,.htm,.kam,.txt,.TXT,.java,.swift,.kt" onchange="loadFile(event)" style="display:none">
+        <!-- KAR: hidden universal mode -->
+        <button class="op-btn" style="color:#ff1f1f;border-color:rgba(255,31,31,0.3);margin-top:4px;" onclick="openKAR()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
+          </svg>
+          Open in KAR
+        </button>
       </div>
       <div class="sp-head">Download as</div>
       <div class="kode-file-ops">
@@ -503,6 +624,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
             <polyline points="14 2 14 8 20 8"/>
           </svg>
           Download .html
+        </button>
+        <button class="op-btn" style="color:#ffb300;border-color:rgba(255,179,0,0.25);" onclick="downloadAs('java')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Download .java
+        </button>
+        <button class="op-btn" style="color:#00e5cc;border-color:rgba(0,229,204,0.25);" onclick="downloadAs('swift')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Download .swift
         </button>
       </div>
       <div class="sp-head"><em id="sp-title">Snippets</em></div>
@@ -604,7 +739,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
       <div class="sc-row"><span class="sc-action">Export</span><span class="sc-key">Ctrl+S</span></div>
       <div class="sc-row"><span class="sc-action">New tab</span><span class="sc-key">Ctrl+T</span></div>
       <div class="sc-row"><span class="sc-action">Close tab</span><span class="sc-key">Ctrl+W</span></div>
-      <div class="sc-row"><span class="sc-action">Clear console</span><span class="sc-key">Ctrl+L</span></div>
+      <div class="sc-row"><span class="sc-action">Clear Konsole</span><span class="sc-key">Ctrl+L</span></div>
       <div class="sc-row"><span class="sc-action">Cycle mode</span><span class="sc-key">Ctrl+M</span></div>
       <div class="sc-row"><span class="sc-action">KREAM refresh</span><span class="sc-key">Ctrl+Enter</span></div>
       <div class="sc-row"><span class="sc-action">This overlay</span><span class="sc-key">?</span></div>
@@ -772,7 +907,7 @@ function drawToolpath(text){
 
   // Draw cut paths
   ctx.lineWidth=1.2;
-  const colors=['#cc1133','#ff4455','#e03358','#ff6677'];
+  const colors=['#e03800','#ff5522','#c83000','#ff6633'];
   geom.paths.forEach((p,pi)=>{
     ctx.strokeStyle=colors[pi%colors.length];
     ctx.beginPath();
@@ -937,7 +1072,6 @@ const kpStat     = document.getElementById('kp-stat');
 
 let mode = 'gkode';
 let simRunning=false, simFrame=null, simIdx=0, simMoves=[];
-let tabIdCtr=1, activeTabId=0;
 let kreamAutoRefresh = true;
 let kreamRefreshTimer = null;
 
@@ -1064,10 +1198,116 @@ M5
 M30
 `;
 
+const KAPPUCCINO_CODE=`// .KODE · ◆ KP — KAPPUCCINO Java
+// ▶ Run or Ctrl+Enter to compile + execute via Piston
+
+public class Main {
+
+    static long fib(int n) {
+        if (n <= 1) return n;
+        return fib(n - 1) + fib(n - 2);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("◆ KAPPUCCINO — Java runtime ready");
+
+        System.out.print("fib(0..9): ");
+        for (int i = 0; i < 10; i++) {
+            System.out.print(fib(i) + (i < 9 ? ", " : "\\n"));
+        }
+
+        record Vec2(double x, double y) {
+            double mag() { return Math.hypot(x, y); }
+            Vec2 add(Vec2 v) { return new Vec2(x + v.x, y + v.y); }
+            public String toString() { return "Vec2(" + x + ", " + y + ")"; }
+        }
+
+        var a = new Vec2(3, 4);
+        var b = new Vec2(1, 2);
+        System.out.println("a + b = " + a.add(b) + " | |a| = " + a.mag());
+    }
+}
+`;
+
+const KWIK_CODE=`// .KODE · ⚡ KW — KWIK Swift
+// ▶ Run or Ctrl+Enter to compile + execute via Piston
+
+import Foundation
+
+func fib(_ n: Int) -> Int {
+    n <= 1 ? n : fib(n - 1) + fib(n - 2)
+}
+
+print("⚡ KWIK — Swift runtime ready")
+
+let fibs = (0..<10).map { fib($0) }
+print("fib(0..<10):", fibs)
+
+struct Vec2 {
+    let x, y: Double
+    var mag: Double { (x*x + y*y).squareRoot() }
+    func add(_ v: Vec2) -> Vec2 { Vec2(x: x + v.x, y: y + v.y) }
+}
+
+let a = Vec2(x: 3, y: 4)
+let b = Vec2(x: 1, y: 2)
+let sum = a.add(b)
+print("a + b = Vec2(\\(sum.x), \\(sum.y)) | |a| = \\(a.mag)")
+`;
+
+const KREMLIN_CODE=`// .KODE · ❋ KL — KREMLIN Kotlin
+// ▶ Run or Ctrl+Enter to compile + execute via Piston
+
+fun fib(n: Int): Long = if (n <= 1) n.toLong() else fib(n - 1) + fib(n - 2)
+
+data class Vec2(val x: Double, val y: Double) {
+    fun mag() = Math.hypot(x, y)
+    operator fun plus(v: Vec2) = Vec2(x + v.x, y + v.y)
+    override fun toString() = "Vec2(\$x, \$y)"
+}
+
+fun main() {
+    println("❋ KREMLIN — Kotlin runtime ready")
+
+    val fibs = (0 until 10).map { fib(it) }
+    println("fib(0..9): \$fibs")
+
+    val a = Vec2(3.0, 4.0)
+    val b = Vec2(1.0, 2.0)
+    println("a + b = \${a + b} | |a| = \${a.mag()}")
+
+    val nums = (1..10).filter { it % 2 == 0 }.map { it * it }.sum()
+    println("even² sum: \$nums")
+}
+`;
+
+const KAR_CODE=`# ▣ KAR — Universal Piston Runner
+# Select your language from the dropdown above, then Run
+
+print("▣ KAR online — pick a language and write your code")
+`;
+
+function openKAR(){
+  const existing=tabs.find(t=>t.mode==='kar');
+  if(existing){ switchTab(existing.id); return; }
+  const t={id:tabIdCtr++,name:'kar-'+(tabIdCtr-1)+'.py',mode:'kar',content:KAR_CODE,modified:false};
+  tabs.push(t);
+  activeTabId=t.id;
+  edEl.value=t.content;
+  setMode('kar',false);
+  renderTabs();
+  document.getElementById('bc-file').textContent=t.name;
+  showToast('▣ KAR — universal Piston runner');
+}
+
 /* ══════════════════════════════
    TAB SYSTEM
 ══════════════════════════════ */
-const tabs=[{id:0,name:'program.nc',mode:'gkode',content:GKODE_CODE,modified:false}];
+const tabs=[
+  {id:0,name:'program.nc',mode:'gkode',content:GKODE_CODE,modified:false},
+  {id:1,name:'main.kt',mode:'kremlin',content:KREMLIN_CODE,modified:false}
+];
+let tabIdCtr=2, activeTabId=0;
 
 function renderTabs(){
   const row=document.getElementById('tabs-row');
@@ -1104,8 +1344,10 @@ function switchTab(id){
 }
 
 function newTab(){
-  const ext=mode==='gkode'?'.nc':mode==='kream'?'.html':'.js';
-  const defaultCode=mode==='gkode'?GKODE_CODE:mode==='kream'?KREAM_CODE:KOFFEE_CODE;
+  const extMap={gkode:'.nc',kream:'.html',koffee:'.js',kappuccino:'.java',kwik:'.swift',kremlin:'.kt',kar:'.py'};
+  const codeMap={gkode:GKODE_CODE,kream:KREAM_CODE,koffee:KOFFEE_CODE,kappuccino:KAPPUCCINO_CODE,kwik:KWIK_CODE,kremlin:KREMLIN_CODE,kar:KAR_CODE};
+  const ext=extMap[mode]||'.txt';
+  const defaultCode=codeMap[mode]||'';
   const t={id:tabIdCtr++,name:'file'+(tabIdCtr-1)+ext,mode,content:defaultCode,modified:false};
   tabs.push(t);switchTab(t.id);
 }
@@ -1124,24 +1366,40 @@ function closeTab(id){
 function setMode(m,silent){
   mode=m;
   $B.className='mode-'+m;
-  const gk=m==='gkode', kr=m==='kream', kf=m==='koffee';
+  const gk=m==='gkode', kr=m==='kream', kf=m==='koffee', kp=m==='kappuccino', kw=m==='kwik', kl=m==='kremlin', kar=m==='kar';
+  const kompile=kp||kw||kl||kar;
   document.getElementById('btn-koffee').classList.toggle('active',kf);
   document.getElementById('btn-kream').classList.toggle('active',kr);
   document.getElementById('btn-gkode').classList.toggle('active',gk);
-  document.getElementById('run-label').textContent=gk?'Preview':kr?'Render':'Run';
+  document.getElementById('btn-kappuccino').classList.toggle('active',kp);
+  document.getElementById('btn-kwik').classList.toggle('active',kw);
+  document.getElementById('btn-kremlin').classList.toggle('active',kl);
+  document.getElementById('run-label').textContent=gk?'Preview':kr?'Render':kompile?'Run ↑':'Run';
   document.getElementById('brand-sub').textContent=
-    gk?'g-code editor + preview':kr?'kream html editor':'koffee javascript repl';
-  document.getElementById('brand-mark').textContent=gk?'GK':kr?'KR':'KF';
-  sbMode.textContent=gk?'● G-code':kr?'● HTML':'● JS';
-  document.getElementById('sb-unit').textContent=gk?'G21 mm':kr?'HTML5':'2 spaces';
+    gk?'g-code editor + preview':kr?'kream html editor':kp?'kappuccino java repl':kw?'kwik swift repl':kl?'kremlin kotlin repl':kar?'kar — universal piston runner':'koffee javascript repl';
+  document.getElementById('brand-mark').textContent=gk?'GK':kr?'KR':kp?'KP':kw?'KW':kl?'KL':kar?'KAR':'KF';
+  sbMode.textContent=gk?'● G-code':kr?'● HTML':kp?'● Java':kw?'● Swift':kl?'● Kotlin':kar?'● KAR':'● JS';
+  document.getElementById('sb-unit').textContent=gk?'G21 mm':kr?'HTML5':kp?'JDK 21':kw?'Swift 5.10':kl?'Kotlin 1.9':kar?'Piston':'2 spaces';
   document.getElementById('ot-machine').style.display=gk?'':'none';
-  document.getElementById('bc-lang').textContent=gk?'G-code':kr?'HTML':'JavaScript';
+  document.getElementById('bc-lang').textContent=gk?'G-code':kr?'HTML':kp?'Java':kw?'Swift':kl?'Kotlin':kar?'KAR':'JavaScript';
+  // kompile controls visibility
+  document.getElementById('kompile-controls').style.display=kompile?'flex':'none';
+  document.getElementById('kompile-div').style.display=kompile?'block':'none';
+  // show correct language dropdown
+  document.getElementById('kompile-lang').style.display=kompile&&!kar?'block':'none';
+  document.getElementById('kar-lang').style.display=kar?'block':'none';
+  // sync language selector
+  if(kp) document.getElementById('kompile-lang').value='java';
+  if(kw) document.getElementById('kompile-lang').value='swift';
+  if(kl) document.getElementById('kompile-lang').value='kotlin';
+  // sim controls
+  document.getElementById('sim-controls').style.display=gk?'flex':'none';
   // show/hide KREAM preview pane
   document.getElementById('kream-preview-pane').style.display=kr?'flex':'none';
   buildSidePanel();
   if(!silent){
     clearConsole();
-    showToast(gk?'⚙ G-KODE — CNC G-code editor':kr?'✦ KREAM — HTML editor':'☕ KF — KOFFEE JavaScript REPL');
+    showToast(gk?'⚙ G-KODE — CNC G-code editor':kr?'✦ KREAM — HTML editor':kp?'◆ KAPPUCCINO — Java via Piston':kw?'⚡ KWIK — Swift via Piston':kl?'❋ KREMLIN — Kotlin via Piston':'☕ KF — KOFFEE JavaScript REPL');
   }
   syncGutter();updateMinimap();lint();applyHL();
   if(kr)scheduleKreamRefresh(0);
@@ -1155,14 +1413,12 @@ document.getElementById('btn-gkode').addEventListener('click', ()=>switchToMode(
 function switchToMode(m){
   const cur=tabs.find(t=>t.id===activeTabId);
   if(cur) cur.content=edEl.value;
-  // If current tab is already this mode, just switch UI
   if(cur && cur.mode===m){ setMode(m,false); return; }
-  // Create new tab in that mode, or find existing one
   const existing=tabs.find(t=>t.mode===m);
   if(existing){ switchTab(existing.id); return; }
-  const ext=m==='gkode'?'.nc':m==='kream'?'.html':'.js';
-  const defaultCode=m==='gkode'?GKODE_CODE:m==='kream'?KREAM_CODE:KOFFEE_CODE;
-  const t={id:tabIdCtr++,name:'file'+(tabIdCtr-1)+ext,mode:m,content:defaultCode,modified:false};
+  const extMap={gkode:'.nc',kream:'.html',koffee:'.js',kappuccino:'.java',kwik:'.swift',kremlin:'.kt',kar:'.py'};
+  const codeMap={gkode:GKODE_CODE,kream:KREAM_CODE,koffee:KOFFEE_CODE,kappuccino:KAPPUCCINO_CODE,kwik:KWIK_CODE,kremlin:KREMLIN_CODE,kar:KAR_CODE};
+  const t={id:tabIdCtr++,name:'file'+(tabIdCtr-1)+(extMap[m]||'.txt'),mode:m,content:codeMap[m]||'',modified:false};
   tabs.push(t);
   activeTabId=t.id;
   edEl.value=t.content;
@@ -1255,9 +1511,42 @@ const GC_SNIPS=[
   {name:'Dwell',         desc:'G4 pause',             code:'G4 P$1   ; dwell $1 seconds'},
 ];
 
+const KP_SNIPS=[
+  {name:'System.out.println', desc:'Print to stdout',    code:'System.out.println($1);'},
+  {name:'main method',        desc:'Entry point',        code:'public static void main(String[] args) {\n    $1\n}'},
+  {name:'for loop',           desc:'Classic for loop',   code:'for (int i = 0; i < $1; i++) {\n    $2\n}'},
+  {name:'ArrayList',          desc:'Dynamic list',       code:'var list = new ArrayList<$1>();\nlist.add($2);'},
+  {name:'HashMap',            desc:'Key-value map',      code:'var map = new HashMap<String, $1>();\nmap.put("$2", $3);'},
+  {name:'record',             desc:'Immutable data class',code:'record $1($2) {}'},
+  {name:'try/catch',          desc:'Exception handling', code:'try {\n    $1\n} catch ($2 e) {\n    System.err.println(e.getMessage());\n}'},
+  {name:'Stream',             desc:'Stream pipeline',    code:'list.stream()\n    .filter($1)\n    .map($2)\n    .collect(Collectors.toList());'},
+];
+
+const KW_SNIPS=[
+  {name:'print',              desc:'Print to stdout',    code:'print($1)'},
+  {name:'func',               desc:'Function definition',code:'func $1($2) -> $3 {\n    $4\n}'},
+  {name:'struct',             desc:'Value type',         code:'struct $1 {\n    let $2: $3\n}'},
+  {name:'for-in',             desc:'For-in loop',        code:'for $1 in $2 {\n    $3\n}'},
+  {name:'guard let',          desc:'Early exit unwrap',  code:'guard let $1 = $2 else { return }'},
+  {name:'if let',             desc:'Optional binding',   code:'if let $1 = $2 {\n    $3\n}'},
+  {name:'closure',            desc:'Swift closure',      code:'{ ($1) -> $2 in\n    $3\n}'},
+  {name:'map/filter',         desc:'Collection ops',     code:'let result = $1.filter { $2 }.map { $3 }'},
+];
+
+const KL_SNIPS=[
+  {name:'println',              desc:'Print to stdout',    code:'println($1)'},
+  {name:'fun',                  desc:'Function definition',code:'fun $1($2): $3 {\n    $4\n}'},
+  {name:'data class',           desc:'Data class',         code:'data class $1($2)'},
+  {name:'for-in',               desc:'For-in loop',        code:'for ($1 in $2) {\n    $3\n}'},
+  {name:'when',                 desc:'When expression',    code:'when ($1) {\n    $2 -> $3\n    else -> $4\n}'},
+  {name:'let',                  desc:'Scope function',     code:'$1?.let {\n    $2\n}'},
+  {name:'listOf',               desc:'Immutable list',     code:'val $1 = listOf($2)'},
+  {name:'map/filter',           desc:'Collection ops',     code:'val result = $1.filter { $2 }.map { $3 }'},
+];
+
 function buildSidePanel(){
-  const snips=mode==='gkode'?GC_SNIPS:mode==='kream'?HTML_SNIPS:JS_SNIPS;
-  const title=mode==='gkode'?'G-code Snippets':mode==='kream'?'HTML Snippets':'JS Snippets';
+  const snips=mode==='gkode'?GC_SNIPS:mode==='kream'?HTML_SNIPS:mode==='kappuccino'?KP_SNIPS:mode==='kwik'?KW_SNIPS:mode==='kremlin'?KL_SNIPS:JS_SNIPS;
+  const title=mode==='gkode'?'G-code Snippets':mode==='kream'?'HTML Snippets':mode==='kappuccino'?'Java Snippets':mode==='kwik'?'Swift Snippets':mode==='kremlin'?'Kotlin Snippets':'JS Snippets';
   document.getElementById('sp-title').textContent=title;
   spBody.innerHTML=snips.map((s,i)=>`
     <div class="snip" data-i="${i}">
@@ -1364,8 +1653,90 @@ function hlGC(code){
   }).join('\n');
 }
 
+function hlJava(code){
+  return code.split('\n').map(line=>{
+    let l=escH(line);
+    // Comments
+    l=l.replace(/(\/\/.*)$/,'<span class="sh-jcmt">$1</span>');
+    if(l.includes('sh-jcmt'))return l;
+    l=l.replace(/(\/\*[\s\S]*?\*\/)/g,'<span class="sh-jcmt">$1</span>');
+    // Annotations
+    l=l.replace(/(@\w+)/g,'<span class="sh-jann">$1</span>');
+    // Strings
+    l=l.replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;)/g,'<span class="sh-jstr">$1</span>');
+    // Keywords
+    l=l.replace(/\b(public|private|protected|static|final|class|interface|record|enum|extends|implements|new|return|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|throws|import|package|void|int|long|double|float|boolean|char|byte|short|var|null|true|false|this|super|instanceof|abstract|synchronized|volatile|transient|native|strictfp|default)\b/g,'<span class="sh-jkw">$1</span>');
+    // Types/Classes (capitalized)
+    l=l.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g,'<span class="sh-jtype">$1</span>');
+    // Method calls
+    l=l.replace(/\b([a-z_][a-zA-Z0-9_]*)(?=\s*\()/g,'<span class="sh-jfn">$1</span>');
+    // Numbers
+    l=l.replace(/\b(\d+(?:\.\d+)?[LlFfDd]?)\b/g,'<span class="sh-jnum">$1</span>');
+    return l;
+  }).join('\n');
+}
+
+function hlSwift(code){
+  return code.split('\n').map(line=>{
+    let l=escH(line);
+    // Comments
+    l=l.replace(/(\/\/.*)$/,'<span class="sh-scmt">$1</span>');
+    if(l.includes('sh-scmt'))return l;
+    // Attributes
+    l=l.replace(/(@\w+)/g,'<span class="sh-sattr">$1</span>');
+    // Strings
+    l=l.replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;)/g,'<span class="sh-sstr">$1</span>');
+    // Keywords
+    l=l.replace(/\b(import|class|struct|enum|protocol|extension|func|var|let|return|if|else|for|while|do|switch|case|break|continue|guard|defer|throw|throws|try|catch|in|where|as|is|nil|true|false|self|super|init|deinit|get|set|willSet|didSet|lazy|static|final|override|mutating|nonmutating|public|private|internal|open|fileprivate|required|convenience|weak|unowned|some|any|async|await|actor)\b/g,'<span class="sh-skw">$1</span>');
+    // Types
+    l=l.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g,'<span class="sh-stype">$1</span>');
+    // Functions
+    l=l.replace(/\b([a-z_][a-zA-Z0-9_]*)(?=\s*\()/g,'<span class="sh-sfn">$1</span>');
+    // Numbers
+    l=l.replace(/\b(\d+(?:\.\d+)?)\b/g,'<span class="sh-snum">$1</span>');
+    return l;
+  }).join('\n');
+}
+
+function hlKAR(code){
+  // Generic best-effort highlighter — works reasonably for Python, Ruby, Go, Bash etc.
+  return code.split('\n').map(line=>{
+    let l=escH(line);
+    l=l.replace(/(#.*)$/,'<span class="sh-karcmt">$1</span>');
+    if(l.includes('sh-karcmt'))return l;
+    l=l.replace(/(\/\/.*)$/,'<span class="sh-karcmt">$1</span>');
+    if(l.includes('sh-karcmt'))return l;
+    l=l.replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;|&#039;(?:[^&]|&(?!#039;))*&#039;)/g,'<span class="sh-karstr">$1</span>');
+    l=l.replace(/\b(if|else|for|while|do|return|function|def|class|import|from|in|not|and|or|true|false|nil|null|None|True|False|let|var|const|func|fn|pub|mod|use|package|struct|interface|type|switch|case|break|continue|try|catch|throw|new|delete|this|self|super|end|do|begin|rescue|ensure|yield|lambda|proc|async|await|print|println|echo|puts|printf)\b/g,'<span class="sh-karkw">$1</span>');
+    l=l.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g,'<span class="sh-karfn">$1</span>');
+    l=l.replace(/\b(\d+(?:\.\d+)?)\b/g,'<span class="sh-karnum">$1</span>');
+    return l;
+  }).join('\n');
+}
+
+function hlKotlin(code){
+  return code.split('\n').map(line=>{
+    let l=escH(line);
+    l=l.replace(/(\/\/.*)$/,'<span class="sh-klcmt">$1</span>');
+    if(l.includes('sh-klcmt'))return l;
+    l=l.replace(/(@\w+)/g,'<span class="sh-klann">$1</span>');
+    l=l.replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;|`[^`]*`)/g,'<span class="sh-klstr">$1</span>');
+    l=l.replace(/\b(fun|val|var|class|object|interface|data|sealed|enum|companion|override|abstract|open|final|private|protected|public|internal|return|if|else|when|for|while|do|break|continue|try|catch|finally|throw|import|package|in|out|is|as|null|true|false|this|super|init|constructor|by|typealias|inline|reified|suspend|coroutine|launch|async|await|it|let|run|also|apply|with)\b/g,'<span class="sh-klkw">$1</span>');
+    l=l.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g,'<span class="sh-kltype">$1</span>');
+    l=l.replace(/\b([a-z_][a-zA-Z0-9_]*)(?=\s*\()/g,'<span class="sh-klfn">$1</span>');
+    l=l.replace(/\b(\d+(?:\.\d+)?[LlFfDd]?)\b/g,'<span class="sh-klnum">$1</span>');
+    return l;
+  }).join('\n');
+}
+
 function applyHL(){
-  hlL.innerHTML=mode==='gkode'?hlGC(edEl.value):mode==='kream'?hlHTML(edEl.value):hlJS(edEl.value);
+  if(mode==='gkode')      hlL.innerHTML=hlGC(edEl.value);
+  else if(mode==='kream') hlL.innerHTML=hlHTML(edEl.value);
+  else if(mode==='kappuccino') hlL.innerHTML=hlJava(edEl.value);
+  else if(mode==='kwik')  hlL.innerHTML=hlSwift(edEl.value);
+  else if(mode==='kremlin') hlL.innerHTML=hlKotlin(edEl.value);
+  else if(mode==='kar')   hlL.innerHTML=hlKAR(edEl.value);
+  else                    hlL.innerHTML=hlJS(edEl.value);
   hlL.scrollTop=edEl.scrollTop;hlL.scrollLeft=edEl.scrollLeft;
 }
 
@@ -1394,7 +1765,7 @@ edEl.addEventListener('keydown',e=>{
   if(ctrl&&e.key==='j'){e.preventDefault();toggleSP();return;}
   if(ctrl&&e.key==='m'){
     e.preventDefault();
-    const cycle={koffee:'kream',kream:'gkode',gkode:'koffee'};
+    const cycle={koffee:'kream',kream:'gkode',gkode:'kappuccino',kappuccino:'kwik',kwik:'kremlin',kremlin:'koffee',kar:'koffee'};
     switchToMode(cycle[mode]||'koffee');return;
   }
   if(e.altKey&&e.key==='f'){e.preventDefault();formatCode();return;}
@@ -1494,13 +1865,47 @@ const AC_GC=[
   {l:'M6',k:'mc',d:'Tool change'},{l:'M30',k:'mc',d:'Program end'},
 ];
 
-let acIdx=0,acMatches=[];
+const AC_KP=[
+  {l:'System.out.println',k:'fn',d:'(...args)→void'},{l:'System.out.print',k:'fn',d:'(...args)→void'},
+  {l:'System.err.println',k:'fn',d:'(...args)→void'},{l:'ArrayList',k:'cls',d:'List<E>'},
+  {l:'HashMap',k:'cls',d:'Map<K,V>'},{l:'String',k:'type',d:'String type'},
+  {l:'public',k:'kw',d:'access modifier'},{l:'private',k:'kw',d:'access modifier'},
+  {l:'static',k:'kw',d:'static member'},{l:'void',k:'kw',d:'return type'},
+  {l:'class',k:'kw',d:'class decl'},{l:'record',k:'kw',d:'data class'},
+  {l:'for',k:'kw',d:'for loop'},{l:'if',k:'kw',d:'conditional'},
+  {l:'return',k:'kw',d:'return value'},{l:'var',k:'kw',d:'local var'},
+  {l:'new',k:'kw',d:'instantiate'},{l:'try',k:'kw',d:'error handling'},
+];
+const AC_KL=[
+  {l:'println',k:'fn',d:'(...args)→Unit'},{l:'print',k:'fn',d:'(...args)→Unit'},
+  {l:'fun',k:'kw',d:'function decl'},{l:'val',k:'kw',d:'immutable binding'},
+  {l:'var',k:'kw',d:'mutable binding'},{l:'class',k:'kw',d:'class decl'},
+  {l:'data class',k:'kw',d:'data class'},{l:'object',k:'kw',d:'singleton'},
+  {l:'if',k:'kw',d:'conditional'},{l:'when',k:'kw',d:'when expression'},
+  {l:'for',k:'kw',d:'for-in loop'},{l:'return',k:'kw',d:'return value'},
+  {l:'null',k:'kw',d:'null value'},{l:'true',k:'kw',d:'boolean'},
+  {l:'String',k:'type',d:'String type'},{l:'Int',k:'type',d:'Int type'},
+  {l:'Long',k:'type',d:'Long type'},{l:'List',k:'type',d:'List<T>'},
+  {l:'Map',k:'type',d:'Map<K,V>'},{l:'let',k:'fn',d:'scope function'},
+];
+const AC_KW=[
+  {l:'print',k:'fn',d:'(...args)→Void'},{l:'println',k:'fn',d:'(...args)→Void'},
+  {l:'func',k:'kw',d:'function decl'},{l:'var',k:'kw',d:'mutable binding'},
+  {l:'let',k:'kw',d:'immutable binding'},{l:'struct',k:'kw',d:'value type'},
+  {l:'class',k:'kw',d:'reference type'},{l:'enum',k:'kw',d:'enumeration'},
+  {l:'if',k:'kw',d:'conditional'},{l:'guard',k:'kw',d:'early exit'},
+  {l:'for',k:'kw',d:'for-in loop'},{l:'return',k:'kw',d:'return value'},
+  {l:'import',k:'kw',d:'module import'},{l:'self',k:'kw',d:'self reference'},
+  {l:'nil',k:'kw',d:'null value'},{l:'true',k:'kw',d:'boolean'},
+  {l:'String',k:'type',d:'String type'},{l:'Int',k:'type',d:'Int type'},
+  {l:'Double',k:'type',d:'Double type'},{l:'Array',k:'type',d:'Array<T>'},
+];
 function triggerAC(){
   const pos=edEl.selectionStart,text=edEl.value.substring(0,pos);
   const m=text.match(/[<A-Za-z][A-Za-z0-9.-]*$/);
   if(!m||m[0].length<1){closeAC();return;}
   const word=m[0];
-  const bank=mode==='gkode'?AC_GC:mode==='kream'?AC_HTML:AC_JS;
+  const bank=mode==='gkode'?AC_GC:mode==='kream'?AC_HTML:mode==='kappuccino'?AC_KP:mode==='kwik'?AC_KW:mode==='kremlin'?AC_KL:AC_JS;
   acMatches=bank.filter(c=>c.l.toUpperCase().startsWith(word.toUpperCase())&&c.l!==word).slice(0,10);
   if(!acMatches.length){closeAC();return;}
   acIdx=0;renderAC();posAC(pos);
@@ -1619,6 +2024,11 @@ let _lc={code:'',issues:[]};
 function lintIssues(){
   if(_lc.code===edEl.value)return _lc.issues;
   const iss=[];const lines=edEl.value.split('\n');
+  if(mode==='kappuccino'||mode==='kwik'||mode==='kar'){
+    // Linting handled server-side by Piston — just check file not empty
+    if(!edEl.value.trim()) iss.push({ln:0,t:'w',msg:'Empty file — nothing to compile'});
+    _lc={code:edEl.value,issues:iss};return iss;
+  }
   if(mode==='koffee'){
     lines.forEach((l,i)=>{
       if(/\bvar\b/.test(l))iss.push({ln:i,t:'w',msg:'Prefer const/let over var'});
@@ -1695,9 +2105,14 @@ function addLog(type,args,ic=''){
 function clearConsole(){
   const hint=mode==='kream'?'Ctrl+Enter to render · ? for shortcuts':
              mode==='gkode'?'Ctrl+Enter to preview · ? for shortcuts':
+             mode==='kappuccino'?'Ctrl+Enter to compile · Java via Piston':
+             mode==='kwik'?'Ctrl+Enter to compile · Swift via Piston':
+             mode==='kremlin'?'Ctrl+Enter to compile · Kotlin via Piston':
+             mode==='kar'?'Select a language · Ctrl+Enter to run via Piston':
              'Ctrl+Enter to run · ? for shortcuts';
-  conPane.innerHTML=`<div class="console-empty"><div class="kode-glyph">.KODE</div>Console cleared<div class="empty-hint">${hint}</div></div>`;
+  conPane.innerHTML=`<div class="console-empty"><div class="kode-glyph">.KODE</div>Konsole cleared<div class="empty-hint">${hint}</div></div>`;
   execBdg.textContent='';execBdg.className='';logN=0;
+  document.getElementById('kompile-status').textContent='';
 }
 
 /* ══════════════════════════════
@@ -1715,6 +2130,7 @@ function runCode(){
   setTimeout(()=>document.getElementById('btn-run').classList.remove('run-flash'),400);
   if(mode==='gkode'){previewGcode();return;}
   if(mode==='kream'){renderKream();return;}
+  if(mode==='kappuccino'||mode==='kwik'||mode==='kremlin'||mode==='kar'){runPiston();return;}
   runJS();
 }
 
@@ -1753,8 +2169,75 @@ return (${edEl.value.trim()});`);
 }
 
 /* ══════════════════════════════
-   G-CODE PREVIEW
+   PISTON — Remote Compile (KAPPUCCINO + KWIK + KREMLIN)
 ══════════════════════════════ */
+async function runPiston(){
+  const langEl = document.getElementById('kompile-lang');
+  const lang = mode==='kappuccino' ? 'java' : mode==='kwik' ? 'swift' : mode==='kremlin' ? 'kotlin' : document.getElementById('kar-lang').value;
+  if(mode!=='kar') document.getElementById('kompile-lang').value = lang===''?'java':lang;
+
+  const statusEl = document.getElementById('kompile-status');
+  conPane.innerHTML=''; logN=0;
+  statusEl.textContent='compiling…';
+  execBdg.textContent='● sending'; execBdg.className='';
+
+  const t0 = performance.now();
+  const fileNames={java:'Main.java',swift:'main.swift',python:'main.py',ruby:'main.rb',go:'main.go',rust:'main.rs',c:'main.c',cpp:'main.cpp',csharp:'Main.cs',php:'main.php',kotlin:'main.kt',scala:'Main.scala',typescript:'main.ts',lua:'main.lua',perl:'main.pl',r:'main.r',haskell:'Main.hs',elixir:'main.exs',erlang:'main.erl',clojure:'main.clj',fsharp:'Main.fsx',bash:'main.sh',powershell:'main.ps1',julia:'main.jl',dart:'main.dart',nasm:'main.asm'};
+  const fileName = fileNames[lang] || 'main.txt';
+  const logType  = mode==='kappuccino'?'kappuccino':mode==='kwik'?'kwik':mode==='kremlin'?'kremlin':'kar';
+
+  try {
+    const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: lang,
+        version: '*',
+        files: [{ name: fileName, content: edEl.value }]
+      })
+    });
+
+    if(!res.ok) throw new Error(`Piston HTTP ${res.status}`);
+    const data = await res.json();
+    const dt   = (performance.now()-t0).toFixed(0);
+
+    statusEl.textContent = `${dt}ms · Piston`;
+
+    // stdout
+    if(data.run?.stdout){
+      data.run.stdout.split('\n').forEach(line=>{
+        if(line) addLog(logType,[line]);
+      });
+    }
+    // stderr (compile errors etc)
+    if(data.run?.stderr){
+      data.run.stderr.split('\n').forEach(line=>{
+        if(line) addLog('error',[line]);
+      });
+    }
+    if(data.compile?.stderr){
+      data.compile.stderr.split('\n').forEach(line=>{
+        if(line) addLog('error',[line]);
+      });
+    }
+
+    const exitCode = data.run?.code ?? 0;
+    if(exitCode===0){
+      execBdg.textContent=`✓ ${dt}ms`; execBdg.className='ok';
+    } else {
+      execBdg.textContent=`✕ exit ${exitCode}`; execBdg.className='err';
+    }
+
+    if(!conPane.children.length)
+      conPane.innerHTML=`<div class="console-empty"><div class="kode-glyph">.KODE</div>No output<div class="empty-hint">Use print() / System.out.println() to output</div></div>`;
+
+  } catch(e) {
+    statusEl.textContent='error';
+    addLog('error',['Piston error: '+e.message]);
+    addLog('warn',['Check your internet connection or try again']);
+    execBdg.textContent='✕ error'; execBdg.className='err';
+  }
+}
 function previewGcode(){
   const txt=edEl.value||'';
   if(!/^\s*[GMT]\d|^\s*%/m.test(txt)){
@@ -1887,7 +2370,10 @@ function loadFile(event){
   const file=event.target.files[0];if(!file)return;
   const ext=file.name.split('.').pop().toLowerCase();
   const targetMode=ext==='nc'||ext==='kam'||ext==='gcode'?'gkode':
-                   ext==='html'||ext==='htm'?'kream':'koffee';
+                   ext==='html'||ext==='htm'?'kream':
+                   ext==='java'?'kappuccino':
+                   ext==='swift'?'kwik':
+                   ext==='kt'?'kremlin':'koffee';
   const reader=new FileReader();
   reader.onload=e=>{
     const t={id:tabIdCtr++,name:file.name,mode:targetMode,content:e.target.result,modified:false};
@@ -1915,7 +2401,8 @@ document.addEventListener('mouseup',()=>{rsz=false;resizerEl.classList.remove('d
    MINIMAP
 ══════════════════════════════ */
 function updateMinimap(){
-  if(mode==='kream')return; // minimap hidden in kream
+  if(mode==='kream')return;
+  if(mode==='kappuccino'||mode==='kwik'||mode==='kremlin'||mode==='kar')return; // no minimap for compiled modes
   const lines=edEl.value.split('\n');
   const W=72,LH=2.6,PAD=4;
   mmCv.width=W;mmCv.height=Math.max(200,lines.length*LH+PAD*2);
@@ -2008,8 +2495,8 @@ function downloadAs(ext) {
   const cur = tabs.find(t => t.id === activeTabId);
   const base = cur ? cur.name.replace(/\.[^.]+$/, '') : 'file';
   const name = base + '.' + ext;
-  const type = ext === 'html' ? 'text/html' :
-               ext === 'js'   ? 'text/javascript' : 'text/plain';
+  const typeMap = { html:'text/html', js:'text/javascript', java:'text/x-java-source', swift:'text/x-swift', kt:'text/x-kotlin' };
+  const type = typeMap[ext] || 'text/plain';
   const blob = new Blob([edEl.value], { type });
   const a    = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = name; a.click();
