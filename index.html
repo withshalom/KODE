@@ -48,8 +48,9 @@
   /* KREAM: cream / warm-white */
   --kr-a:#f2e8d0;--kr-b:#fff8ef;--kr-c:#c8b48c;
   --kr-g:rgba(242,232,208,0.18);
-  /* G·KODE: amber + green */
-  --gk-a:#e03800;--gk-b:#fff0e8;--gk-c:#c83000;
+  /* G·KODE: amber + green — fixed to actually be amber (was mistakenly
+     red, #e03800/#c83000, despite this comment) */
+  --gk-a:#ffaa00;--gk-b:#fff4e0;--gk-c:#cc8800;
   /* KAPPUCCINO: deep black + bold amber */
   --kp-a:#ffb300;--kp-b:#fff8e1;--kp-c:#c67c00;--kp-d:#1a0f00;
   /* KWIK: electric teal + ice white */
@@ -60,8 +61,9 @@
   --kl-a:#39ff14;--kl-b:#e8ffe0;--kl-c:#1db800;--kl-d:#011a00;
   /* KOBRA: Python — jet black + lethal red */
   --kb-a:#e01010;--kb-b:#ff4444;--kb-c:#a00000;--kb-d:#0a0000;
-  /* semantic */
-  --green:#e03800;--amber:#ffaa00;--red:#ff4455;--blue:#2b86c5;
+  /* semantic — --green was mistakenly aliased to the GK red value;
+     fixed to an actual green so #exec-badge.ok and .val-str read right */
+  --green:#22c55e;--amber:#ffaa00;--red:#ff4455;--blue:#2b86c5;
   /* text */
   --t1:#dde8f5;--t2:#7080a0;--t3:#384860;--t4:#1a2535;
   /* fonts */
@@ -88,7 +90,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .brand-mark{width:30px;height:30px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-weight:600;font-size:8px;color:#000;letter-spacing:0.04em;transition:all 0.4s;}
 .mode-koffee .brand-mark{background:linear-gradient(135deg,#2c1208 0%,#6b3d1a 40%,#d4aa78 100%);box-shadow:0 0 20px rgba(180,100,30,0.7);color:#f5e6c8;}
 .mode-kream  .brand-mark{background:linear-gradient(135deg,#f5e6c8 0%,#d4aa78 50%,#3a1e08 100%);box-shadow:0 0 20px rgba(212,170,120,0.5);color:#f5e6c8;}
-.mode-gkode    .brand-mark{background:linear-gradient(135deg,var(--gk-a),var(--gk-b));box-shadow:0 0 18px rgba(224,56,0,0.4);}
+.mode-gkode    .brand-mark{background:linear-gradient(135deg,var(--gk-a),var(--gk-b));box-shadow:0 0 18px rgba(255,170,0,0.4);}
 .mode-kappuccino .brand-mark{background:linear-gradient(135deg,#1a0f00 0%,#7a4500 40%,#ffb300 100%);box-shadow:0 0 20px rgba(255,179,0,0.6);color:#fff8e1;}
 .mode-kwik      .brand-mark{background:linear-gradient(135deg,#001a18 0%,#00574f 40%,#00e5cc 100%);box-shadow:0 0 20px rgba(0,229,204,0.5);color:#e8fffe;}
 .mode-kar       .brand-mark{background:linear-gradient(135deg,#1a0000 0%,#880000 40%,#ff1f1f 100%);box-shadow:0 0 22px rgba(255,31,31,0.7);color:#ffffff;}
@@ -112,11 +114,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .mode-btn{padding:4px 10px;font-family:var(--fm);font-size:9px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border-radius:5px;cursor:pointer;border:none;background:transparent;color:var(--t3);transition:all 0.2s;white-space:nowrap;}
 .mode-btn.active.koffee{background:linear-gradient(90deg,#d4aa78,#f2e8d0);color:#1a100a;font-weight:600;box-shadow:0 0 14px rgba(212,170,120,0.4),inset 0 0 0 1px rgba(212,170,120,0.5);}
 .mode-btn.active.kream {background:linear-gradient(90deg,#c8b48c,#f2e8d0,#fff8ef);color:#2a1a08;font-weight:600;box-shadow:0 0 16px rgba(242,232,208,0.5),inset 0 0 0 1px rgba(242,232,208,0.6);}
-.mode-btn.active.gkode {background:linear-gradient(90deg,rgba(224,56,0,0.18),rgba(255,232,239,0.18));color:var(--gk-a);}
+.mode-btn.active.gkode {background:linear-gradient(90deg,rgba(255,170,0,0.18),rgba(255,244,224,0.18));color:var(--gk-a);}
 .mode-btn.active.kappuccino{background:linear-gradient(90deg,#1a0f00,#7a4500,#ffb300);color:#fff8e1;font-weight:600;box-shadow:0 0 16px rgba(255,179,0,0.35),inset 0 0 0 1px rgba(255,179,0,0.4);}
 .mode-btn.active.kwik  {background:linear-gradient(90deg,#001a18,#00574f,#00e5cc);color:#e8fffe;font-weight:600;box-shadow:0 0 16px rgba(0,229,204,0.35),inset 0 0 0 1px rgba(0,229,204,0.4);}
 .mode-btn.active.kremlin{background:linear-gradient(90deg,#011a00,#0a5200,#39ff14);color:#e8ffe0;font-weight:600;box-shadow:0 0 16px rgba(57,255,20,0.35),inset 0 0 0 1px rgba(57,255,20,0.4);}
 .mode-btn.active.kobra  {background:linear-gradient(90deg,#000000,#3a0000,#e01010);color:#ff4444;font-weight:600;box-shadow:0 0 16px rgba(224,16,16,0.5),inset 0 0 0 1px rgba(224,16,16,0.5);}
+.mode-btn.active.kar    {background:linear-gradient(90deg,#1a0000,#880000,#ff1f1f);color:#ffffff;font-weight:600;box-shadow:0 0 16px rgba(255,31,31,0.5),inset 0 0 0 1px rgba(255,31,31,0.5);}
 
 .tbb{height:28px;padding:0 8px;display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:10px;color:var(--t2);background:none;border:none;border-radius:5px;cursor:pointer;transition:all 0.12s;letter-spacing:0.03em;white-space:nowrap;}
 .tbb:hover{color:var(--t1);background:var(--hover);}
@@ -125,7 +128,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .btn-run{height:28px;padding:0 13px;display:flex;align-items:center;gap:6px;font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:0.06em;border:none;border-radius:5px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
 .mode-koffee .btn-run{background:linear-gradient(90deg,var(--kf-a),var(--blue));color:#000;box-shadow:0 0 14px rgba(212,170,120,0.3);}
 .mode-kream  .btn-run{background:linear-gradient(90deg,var(--kr-b),var(--kr-c),#3a1e08);color:#f5e6c8;box-shadow:0 0 14px rgba(212,170,120,0.3);}
-.mode-gkode    .btn-run{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));color:#000;box-shadow:0 0 14px rgba(224,56,0,0.3);}
+.mode-gkode    .btn-run{background:linear-gradient(90deg,var(--gk-a),var(--gk-b));color:#000;box-shadow:0 0 14px rgba(255,170,0,0.3);}
 .mode-kappuccino .btn-run{background:linear-gradient(90deg,var(--kp-d),var(--kp-a));color:#000;box-shadow:0 0 16px rgba(255,179,0,0.4);}
 .mode-kwik      .btn-run{background:linear-gradient(90deg,var(--kw-d),var(--kw-a));color:#001a18;box-shadow:0 0 16px rgba(0,229,204,0.4);}
 .mode-kar       .btn-run{background:linear-gradient(90deg,var(--kar-d),var(--kar-a),var(--kar-b));color:#1a0000;box-shadow:0 0 18px rgba(255,31,31,0.5);font-weight:700;}
@@ -196,7 +199,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 #editor{position:absolute;top:0;left:0;right:0;bottom:0;padding:14px 16px;font-family:var(--fm);font-size:12.5px;line-height:1.72;background:var(--bg);color:var(--t1);border:none;outline:none;resize:none;tab-size:2;white-space:pre;overflow-y:auto;overflow-x:auto;caret-color:var(--acc);letter-spacing:0.01em;scrollbar-width:thin;scrollbar-color:var(--border) transparent;z-index:2;}
 #editor::selection{background:rgba(212,170,120,0.22);}
 .mode-kream  #editor::selection{background:rgba(242,232,208,0.18);}
-.mode-gkode  #editor::selection{background:rgba(224,56,0,0.14);}
+.mode-gkode  #editor::selection{background:rgba(255,170,0,0.14);}
 
 /* ── RIGHT PANE (minimap / toolpath / html preview) ── */
 #right-pane{width:72px;background:var(--bg);border-left:1px solid var(--border);overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;}
@@ -307,7 +310,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 #statusbar{height:24px;flex-shrink:0;display:flex;align-items:center;padding:0 12px;gap:14px;font-family:var(--fm);font-size:10px;font-weight:500;color:rgba(0,0,0,0.75);letter-spacing:0.04em;transition:background 0.4s;}
 .mode-koffee #statusbar{background:linear-gradient(90deg,#d4aa78,#f2e8d0,#b88848);opacity:0.95;}
 .mode-kream  #statusbar{background:linear-gradient(90deg,#c8b48c,#f2e8d0,#fff8ef,#e0d0b0);opacity:0.95;}
-.mode-gkode    #statusbar{background:linear-gradient(90deg,rgba(224,56,0,0.88),rgba(255,232,239,0.88));}
+.mode-gkode    #statusbar{background:linear-gradient(90deg,rgba(255,170,0,0.88),rgba(255,244,224,0.88));}
 .mode-kappuccino #statusbar{background:linear-gradient(90deg,#1a0f00,#7a4500,#ffb300,#fff8e1);opacity:0.97;}
 .mode-kwik      #statusbar{background:linear-gradient(90deg,#001a18,#00574f,#00e5cc,#e8fffe);opacity:0.97;}
 .mode-kar       #statusbar{background:linear-gradient(90deg,#1a0000,#880000,#ff1f1f,#ffffff);opacity:0.97;}
@@ -334,7 +337,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .sh-g{color:#ffaa00;font-weight:600;}
 .sh-m{color:#ff7b72;font-weight:600;}
 .sh-coord{color:#00d4ff;}
-.sh-param{color:#e03800;}
+.sh-param{color:#ffaa00;}
 .sh-gcmt{color:#5a7090;font-style:italic;}
 /* Java (KAPPUCCINO) */
 .sh-jkw{color:#ffb300;font-weight:600;}
@@ -380,7 +383,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 .mode-gkode #sim-controls{display:flex;}
 .sim-btn{height:22px;width:22px;display:flex;align-items:center;justify-content:center;background:var(--panel2);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--t2);font-size:10px;transition:all 0.12s;flex-shrink:0;}
 .sim-btn:hover{color:var(--gk-a);border-color:var(--gk-a);}
-.sim-btn.active{background:rgba(224,56,0,0.15);color:var(--gk-a);border-color:var(--gk-a);}
+.sim-btn.active{background:rgba(255,170,0,0.15);color:var(--gk-a);border-color:var(--gk-a);}
 #sim-speed{width:52px;height:4px;accent-color:var(--gk-a);cursor:pointer;}
 .sim-lbl{font-family:var(--fm);font-size:9px;color:var(--t3);}
 
@@ -418,8 +421,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
   transition:all 0.15s;letter-spacing:0.04em;width:100%;}
 .op-btn:hover{background:var(--hover);border-color:var(--border-hi);color:var(--t1);}
 .op-btn svg{width:12px;height:12px;flex-shrink:0;}
-.op-btn.nc  {color:#e03800;border-color:rgba(224,56,0,0.25);}
-.op-btn.nc:hover {background:rgba(224,56,0,0.06);border-color:#e03800;}
+.op-btn.nc  {color:#ffaa00;border-color:rgba(255,170,0,0.25);}
+.op-btn.nc:hover {background:rgba(255,170,0,0.06);border-color:#ffaa00;}
 .op-btn.js  {color:#d4aa78;border-color:rgba(212,170,120,0.25);}
 .op-btn.js:hover {background:rgba(212,170,120,0.06);border-color:#d4aa78;}
 .op-btn.htm {color:#f2e8d0;border-color:rgba(242,232,208,0.2);}
@@ -453,12 +456,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
 }
 #tp-sendkam {
   position:absolute; top:8px; right:8px;
-  padding:4px 10px; background:rgba(224,56,0,0.15);
+  padding:4px 10px; background:rgba(255,170,0,0.15);
   border:1px solid var(--gk-a); border-radius:3px;
   font-family:var(--fm); font-size:9px; color:var(--gk-a);
   cursor:pointer; transition:all 0.15s; letter-spacing:0.06em;
 }
-#tp-sendkam:hover { background:rgba(224,56,0,0.28); }
+#tp-sendkam:hover { background:rgba(255,170,0,0.28); }
 
 /* ── G-code library pane ───────────────────────────────────── */
 #lib-pane {
@@ -513,6 +516,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:va
     <button class="mode-btn kwik"           id="btn-kwik"      onclick="setMode('kwik')">KW</button>
     <button class="mode-btn kremlin"        id="btn-kremlin"   onclick="setMode('kremlin')">KL</button>
     <button class="mode-btn kobra"          id="btn-kobra"     onclick="setMode('kobra')">KB</button>
+    <button class="mode-btn kar"            id="btn-kar"       onclick="setMode('kar')">KAR</button>
   </div>
   <div class="tb-div"></div>
   <button class="tbb" id="btn-snip" title="Snippets (Ctrl+J)">
@@ -921,7 +925,7 @@ function drawToolpath(text){
 
   // Draw cut paths
   ctx.lineWidth=1.2;
-  const colors=['#e03800','#ff5522','#c83000','#ff6633'];
+  const colors=['#ffaa00','#ffc94d','#cc8800','#ffcf70'];
   geom.paths.forEach((p,pi)=>{
     ctx.strokeStyle=colors[pi%colors.length];
     ctx.beginPath();
@@ -1420,6 +1424,7 @@ function setMode(m,silent){
   document.getElementById('btn-kwik').classList.toggle('active',kw);
   document.getElementById('btn-kremlin').classList.toggle('active',kl);
   document.getElementById('btn-kobra').classList.toggle('active',kb);
+  document.getElementById('btn-kar').classList.toggle('active',kar);
   document.getElementById('run-label').textContent=gk?'Preview':kr?'Render':kompile?'Run ↑':'Run';
   document.getElementById('brand-sub').textContent=
     gk?'g-code editor + preview':kr?'kream html editor':kp?'kappuccino java repl':kw?'kwik swift repl':kl?'kremlin kotlin repl':kb?'kobra python repl':kar?'kar — universal piston runner':'koffee javascript repl';
@@ -1457,6 +1462,7 @@ document.getElementById('btn-kream').addEventListener('click', ()=>switchToMode(
 document.getElementById('btn-gkode').addEventListener('click', ()=>switchToMode('gkode'));
 document.getElementById('btn-kremlin').addEventListener('click',()=>switchToMode('kremlin'));
 document.getElementById('btn-kobra').addEventListener('click',()=>switchToMode('kobra'));
+document.getElementById('btn-kar').addEventListener('click',()=>switchToMode('kar'));
 
 function switchToMode(m){
   const cur=tabs.find(t=>t.id===activeTabId);
